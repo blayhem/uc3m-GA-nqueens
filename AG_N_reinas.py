@@ -36,8 +36,20 @@ class Queens:
         return torneo(poblacion, K, L);
 
     def torneo(poblacion, K, L):
-        muestra = # seleccionar K de poblacion
+        muestra = []
+        taken = []
+        '''
+        Construimos la muestra K a partir de poblacion
+        '''
+        for i in range(0,K):
+            sel = r.randrange(0,len(poblacion))
+            while(sel in taken):
+                sel = r.randrange(0,len(poblacion));
+            muestra.append(poblacion[sel])
+            taken.append(sel)
 
+        muestra.sort(key=getFitness)
+        
         pass;
 
     def cruzar(poblacion):

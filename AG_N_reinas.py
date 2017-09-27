@@ -4,6 +4,7 @@ import sys
 class Queens:
 
     def __init__(self, N):
+        self.N = N;
         self.fitnesses = [];
 
         poblacion = [];
@@ -14,28 +15,31 @@ class Queens:
 
     def main(self):
         poblacion = self.poblacion;
+        criteriodeparada = False;
         while ( not criteriodeparada ):
-            padres = seleccion(poblacion);
-            nuevaPoblacion = cruzar(padres);
-            # mutacion, reemplazo?
-            # generacion despues de cruce: si hijo ya en poblacion, do not add
-            reinas = nuevaPoblacion;
+            padres = self.seleccion(poblacion);
+            nuevaPoblacion = self.cruzar(padres);
+            # mutamos la nueva poblacion
+            nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), nuevaPoblacion));
+            # reemplazo?
+            # nuevaPoblacion: si hijo ya en poblacion, do not add
+            poblacion = nuevaPoblacion;
+            criteriodeparada = True;
 
-    def getFitness(poblacion):
-        N = len(poblacion)
+    def getFitness(self, poblacion):
         bad = 0;
         for (y, reina) in enumerate(poblacion):
             break;
 
         # return (n/N - bad/n)
-        return (1 - bad/N)
+        return (1 - bad/self.N)
 
-    def seleccion(poblacion):
+    def seleccion(self, poblacion):
         K = 4;
         L = 2;
-        return torneo(poblacion, K, L);
+        return self.torneo(poblacion, K, L);
 
-    def torneo(poblacion, K, L):
+    def torneo(self, poblacion, K, L):
         muestra = []
         taken = []
         '''
@@ -48,12 +52,21 @@ class Queens:
             muestra.append(poblacion[sel])
             taken.append(sel)
 
-        muestra.sort(key=getFitness)
-        
-        pass;
+        muestra.sort(key=self.getFitness)
+        return muestra[0:L]
 
-    def cruzar(poblacion):
-        pass;
+    def cruzar(self, poblacion):
+        return poblacion;
+
+    def mutacion(self, individuo):
+        p = 0.001; # probabilidad de mutar
+        for i in range(0, len(individuo)):
+            if(r.uniform(0, 1) < p):
+                individuo[i] = r.randrange(0,N);
+
+        return individuo;
 
 
-a = Queens(int(sys.argv[1]))
+
+queens = Queens(int(sys.argv[1]))
+queens.main()

@@ -8,9 +8,10 @@ class Queens:
     def __init__(self, N):
         self.N = N;
         self.fitnesses = [];
+        self.evaluaciones = 0;
 
         poblacion = [];
-        for p in range(0, 100):
+        for p in range(0, 200):
             poblacion.append([r.randrange(0,N) for i in range(0,N)]);
 
         self.poblacion = poblacion;
@@ -19,16 +20,17 @@ class Queens:
         poblacion = self.poblacion;
         criteriodeparada = False;
         while ( not criteriodeparada ):
+        # for i in range(0, 200):
             '''
             1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.
             '''
-            print('\npoblacion inicial:', len(poblacion))
+            # print('\npoblacion inicial:', len(poblacion))
             padres = self.seleccion(poblacion);
-            print('padres:', padres)
+            # print('padres:', padres)
             # map(lambda p: poblacion.pop(poblacion.index(p)), padres);
             # for p in padres:
             #     poblacion.pop(poblacion.index(p))
-            print('poblacion sin padres: ', len(poblacion))
+            # print('poblacion sin padres: ', len(poblacion))
 
             '''
             2. Hacemos cruce con reemplazo, los padres vuelven a la poblacion
@@ -36,29 +38,46 @@ class Queens:
             self.cruce nos devuelve 4 individuos, 2 padres y 2 hijos.
             '''
             nuevaPoblacion = self.cruzar(padres);
-            print('despues de cruce: \t', nuevaPoblacion)
+            # print('despues de cruce: \t', nuevaPoblacion)
 
             '''
             3. Mutamos la nueva poblacion.
             Politica opcional: if son has clone in poblacion, do not add.
             '''
             nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), nuevaPoblacion));
-            print('con mutacion: \t\t', nuevaPoblacion)
+            # print('con mutacion: \t\t', nuevaPoblacion)
             poblacion += nuevaPoblacion;
-            criteriodeparada = True;
+            # criteriodeparada = True;
 
     def getFitness(self, individuo):
-        bad = 0;
-        reinas = []
-        for (y, x) in enumerate(individuo): # tuplas de posiciones de reinas
-            reinas.append([x, y]);
-            # if(r[0]==x or r[1]==y or r[0]-r[1] == x-y or r[1]+r[0] == y+x):
-            #     bad += 1;
-
-            break;
+        try:
+            i = self.fitnesses.index(individuo);
+            return self.fitnesses[i];
+        except:
+            self.evaluaciones += 1;
+            bad = 0;
+            for (ind_y, ind_x) in enumerate(individuo): # posiciones de reinas
+                for (r_y, r_x) in enumerate(individuo): # resto de reinas
+                    if(r_x == ind_x):
+                        continue; # mismo individuo
+                    elif(r_x==ind_x or r_y==ind_y or r_x-r_y == ind_x-ind_y or r_x+r_y == ind_x+ind_y):
+                        bad += 1;
 
         # return (n/N - bad/n)
-        return (1 - bad/self.N)
+        print("adjacent queens: ", bad)
+        fitness = (1 - bad/self.N)
+
+        umbral = 0.001
+        if(fitness == 1):
+            print('\n SOLUTION FOUND: ', individuo, '\n')
+            board = [(y, x) for (y, x) in enumerate(individuo)]
+            print(board)
+            self.print_board(board);
+            print(self.evaluaciones, ' evaluaciones')
+            exit()
+
+        self.fitnesses.append(fitness)
+        return fitness;
 
     def seleccion(self, poblacion):
         K = 4;
@@ -98,11 +117,31 @@ class Queens:
         p = 0.001; # probabilidad de mutar
         for i in range(0, len(individuo)):
             if(r.uniform(0, 1) < p):
+                # mutacion = shuffle por segmentos
                 individuo[i] = r.randrange(0,self.N);
 
         return individuo;
 
 
+
+    def print_line(self, n):
+        print('|',end='')
+        for i in range(0,n):
+            print('---|', end='')
+        print('')
+
+    def print_board(self, board):
+        n = len(board)
+        self.print_line(n)
+        for i in range(0,n):
+            print('|',end='')
+            for j in range(0,n):
+                if(board[i]==(i,j)):
+                    print(' R |',end='')
+                else:
+                    print('   |',end='')
+            print('')
+            self.print_line(n)
 
 queens = Queens(int(sys.argv[1]))
 queens.main()

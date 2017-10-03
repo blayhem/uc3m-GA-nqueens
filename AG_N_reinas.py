@@ -8,24 +8,37 @@ class Queens:
     def __init__(self, N):
         self.N = N;
         self.fitnesses = [];
+        self.solutions = [];
         self.evaluaciones = 0;
+        self.criterioDeParada = False;
 
         poblacion = [];
+        orderedList = [i for i in range(0,N)]
         for p in range(0, 200):
-            poblacion.append([r.randrange(0,N) for i in range(0,N)]);
+            r.shuffle(orderedList)
+            poblacion.append(orderedList);
 
         self.poblacion = poblacion;
 
     def main(self):
         poblacion = self.poblacion;
-        criteriodeparada = False;
-        while ( not criteriodeparada ):
+        while ( not self.criterioDeParada ):
         # for i in range(0, 200):
+            '''
+            0. Calculamos fitness de la poblacion para revisar el criterio
+            de parada
+            '''
+            for individuo in poblacion:
+                self.check_exit(individuo)
+
+
             '''
             1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.
             '''
             # print('\npoblacion inicial:', len(poblacion))
             padres = self.seleccion(poblacion);
+            # 2 torneos mejor que 1 torneo doble?
+            padres += padres;
             # print('padres:', padres)
             # map(lambda p: poblacion.pop(poblacion.index(p)), padres);
             # for p in padres:
@@ -37,14 +50,15 @@ class Queens:
             porque K=4 pero L=2 (perdemos 2 individuos).
             self.cruce nos devuelve 4 individuos, 2 padres y 2 hijos.
             '''
-            nuevaPoblacion = self.cruzar(padres);
+                # nuevaPoblacion = self.cruzar(padres);
             # print('despues de cruce: \t', nuevaPoblacion)
 
             '''
             3. Mutamos la nueva poblacion.
             Politica opcional: if son has clone in poblacion, do not add.
             '''
-            nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), nuevaPoblacion));
+            # nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), nuevaPoblacion));
+            nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), padres));
             # print('con mutacion: \t\t', nuevaPoblacion)
             poblacion += nuevaPoblacion;
             # criteriodeparada = True;
@@ -64,18 +78,11 @@ class Queens:
                         bad += 1;
 
         # return (n/N - bad/n)
-        print("adjacent queens: ", bad)
-        fitness = (1 - bad/self.N)
-
-        umbral = 0.001
-        if(fitness == 1):
-            print('\n SOLUTION FOUND: ', individuo, '\n')
-            board = [(y, x) for (y, x) in enumerate(individuo)]
-            print(board)
-            self.print_board(board);
-            print(self.evaluaciones, ' evaluaciones')
-            exit()
-
+        # print("adjacent queens: ", bad)
+        if(bad == 0):
+            fitness = 1;
+        else:
+            fitness = (1 - bad/self.N)
         self.fitnesses.append(fitness)
         return fitness;
 
@@ -97,11 +104,12 @@ class Queens:
             muestra.append(poblacion.pop(sel));
             taken.append(sel);
 
-        muestra.sort(key=self.getFitness)
+        muestra.sort(key=self.getFitness, reverse=True)
         return muestra[0:L]
 
     def cruzar(self, poblacion):
         pc = 0.2; # crossover probability
+        # para cada bit: coger 1 u otro del padre, o random (0,N)
 
         for i in range(0, 2):
             if(r.uniform(0,1) < pc):
@@ -114,11 +122,13 @@ class Queens:
         return poblacion;
 
     def mutacion(self, individuo):
-        p = 0.001; # probabilidad de mutar
-        for i in range(0, len(individuo)):
-            if(r.uniform(0, 1) < p):
-                # mutacion = shuffle por segmentos
-                individuo[i] = r.randrange(0,self.N);
+        p = 1; # probabilidad de mutar
+        # p dependiente de N
+        # for i in range(0, len(individuo)):
+        if(r.uniform(0, 1) < p):
+            # mejor: swap de 2 valores
+            r.shuffle(individuo)
+                # individuo[i] = r.randrange(0,self.N);
 
         return individuo;
 
@@ -142,6 +152,19 @@ class Queens:
                     print('   |',end='')
             print('')
             self.print_line(n)
+
+    def check_exit(self, individuo):
+        umbral = 0.001
+        fitness = self.getFitness(individuo);
+        if(fitness >= 1-umbral ): #and individuo not in self.solutions):
+            # self.solutions.append(individuo);
+            print('\n SOLUTION FOUND: ', individuo, '\n')
+            print(self.evaluaciones, ' evaluaciones')
+            board = [(y, x) for (y, x) in enumerate(individuo)]
+            self.print_board(board);
+
+            exit()
+            # self.criterioDeParada = True;
 
 queens = Queens(int(sys.argv[1]))
 queens.main()

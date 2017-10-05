@@ -12,15 +12,27 @@ class Queens:
         '''
         Posibles paramametros:
         N: numero de reinas, dimension del tablero
+        i: iteraciones del AG
+        P: tamaño de población
         K: tamaño de muestra de selección
         L: número de ganadores del torneo (padres)
+
+        u: umbral de fitness evaluation
+        pm: probabilidad de mutación
+        pc: probabilidad de cruce
+
         '''
         self.N = N;
-        self.fitnesses = [];
-        self.solutions = [];
-        self.evaluaciones = 0;
+
+        self.fitnesses = [];   # cache de evaluaciones
+        self.evaluaciones = 0; # num de evaluaciones
         self.criterioDeParada = False;
 
+        self.solutions = [];
+
+        '''
+        Inicialización de la población:
+        '''
         poblacion = [];
         orderedList = [i for i in range(0,N)]
         for p in range(0, 200):
@@ -31,8 +43,8 @@ class Queens:
 
     def main(self):
         poblacion = self.poblacion;
-        while ( not self.criterioDeParada ):
-        # for i in range(0, 200):
+        # while ( not self.criterioDeParada ):
+        for i in range(0, 200):
             '''
             0. Calculamos fitness de la poblacion para revisar el criterio
             de parada
@@ -40,19 +52,17 @@ class Queens:
             for individuo in poblacion:
                 self.check_exit(individuo)
 
+            if(self.criterioDeParada):
+                break;
 
             '''
             1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.
             '''
-            # print('\npoblacion inicial:', len(poblacion))
             padres = self.seleccion(poblacion);
             # 2 torneos mejor que 1 torneo doble?
             padres += padres;
-            # print('padres:', padres)
-            # map(lambda p: poblacion.pop(poblacion.index(p)), padres);
             # for p in padres:
             #     poblacion.pop(poblacion.index(p))
-            # print('poblacion sin padres: ', len(poblacion))
 
             '''
             2. Hacemos cruce con reemplazo, los padres vuelven a la poblacion
@@ -70,7 +80,6 @@ class Queens:
             nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), padres));
             # print('con mutacion: \t\t', nuevaPoblacion)
             poblacion += nuevaPoblacion;
-            # criteriodeparada = True;
             break;
 
     def getFitness(self, individuo):
@@ -133,17 +142,17 @@ class Queens:
         return poblacion;
 
     def mutacion(self, individuo):
-        p = 1; # probabilidad de mutar
-        # p dependiente de N
-        # for i in range(0, len(individuo)):
-        if(r.uniform(0, 1) < p):
-            # mejor: swap de 2 valores
-            r.shuffle(individuo)
-                # individuo[i] = r.randrange(0,self.N);
+        p = 0.5*(1/self.N); # probabilidad de mutar
+        size = len(individuo)
+
+        for i in range(0, size):
+            if(r.uniform(0, 1) < p):
+                j = r.randrange(0, size);
+                prev = individuo[i]
+                individuo[i] = individuo[j]
+                individuo[j] = prev;
 
         return individuo;
-
-
 
     def print_line(self, n):
         print('|',end='')
@@ -174,8 +183,21 @@ class Queens:
             board = [(y, x) for (y, x) in enumerate(individuo)]
             self.print_board(board);
 
-            exit()
-            # self.criterioDeParada = True;
+            self.criterioDeParada = True;
 
-queens = Queens(int(sys.argv[1]))
-queens.main()
+try:
+
+    N = int(sys.argv[1])
+    i = int(sys.argv[2])
+    P = int(sys.argv[3])
+    K = int(sys.argv[4])
+    L = int(sys.argv[5])
+
+    queens = Queens(int(sys.argv[1]))
+    queens.main()
+
+except:
+    print('Wrong number of arguments')
+    print('Try -h to view full list of arguments')
+
+

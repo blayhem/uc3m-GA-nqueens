@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import random as r
 import sys
 import math
@@ -6,6 +9,12 @@ import functools as ft
 class Queens:
 
     def __init__(self, N):
+        '''
+        Posibles paramametros:
+        N: numero de reinas, dimension del tablero
+        K: tamaño de muestra de selección
+        L: número de ganadores del torneo (padres)
+        '''
         self.N = N;
         self.fitnesses = [];
         self.solutions = [];
@@ -62,6 +71,7 @@ class Queens:
             # print('con mutacion: \t\t', nuevaPoblacion)
             poblacion += nuevaPoblacion;
             # criteriodeparada = True;
+            break;
 
     def getFitness(self, individuo):
         try:
@@ -94,6 +104,7 @@ class Queens:
     def torneo(self, poblacion, K, L):
         muestra = []
         taken = []
+        reverse = False;
         '''
         Construimos la muestra K a partir de poblacion
         '''
@@ -104,7 +115,7 @@ class Queens:
             muestra.append(poblacion.pop(sel));
             taken.append(sel);
 
-        muestra.sort(key=self.getFitness, reverse=True)
+        muestra.sort(key=self.getFitness, reverse=reverse)
         return muestra[0:L]
 
     def cruzar(self, poblacion):

@@ -1,0 +1,19 @@
+\select@language {spanish}
+\contentsline {section}{\'{I}ndice}{1}{section*.1}
+\contentsline {section}{\numberline {1}Contexto.}{2}{section.1}
+\contentsline {subsection}{\numberline {1.1}Problema de las 8 reinas.}{2}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Problema planteado.}{2}{subsection.1.2}
+\contentsline {section}{\numberline {2}Solucionar las N-reinas empleando fuerza bruta.}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}\IeC {\textquestiondown }Cu\IeC {\'a}nto se tarda en obtener la primera soluci\IeC {\'o}n?}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}\IeC {\textquestiondown }Cu\IeC {\'a}nto se tardan en obtener soluciones subsecuentes?}{2}{subsection.2.2}
+\contentsline {section}{\numberline {3}Solucionar las N-reinas con Algoritmos Gen\IeC {\'e}ticos.}{2}{section.3}
+\contentsline {subsection}{\numberline {3.1}Codificaci\IeC {\'o}n.}{2}{subsection.3.1}
+\contentsline {subsubsection}{\numberline {3.1.1}\IeC {\textquestiondown }Por qu\IeC {\'e} es mejor que otras alternativas?}{2}{subsubsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.2}\IeC {\textquestiondown }Qu\IeC {\'e} otras alternativas se han barajado y descartado?}{3}{subsubsection.3.1.2}
+\contentsline {subsection}{\numberline {3.2}Funci\IeC {\'o}n de fitness.}{3}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}M\IeC {\'e}todos}{3}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Parametrizaci\IeC {\'o}n}{3}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Resultados}{4}{subsection.3.5}
+\contentsline {section}{\numberline {4}Conclusiones, Problemas Encontrados y Opiniones Personales}{5}{section.4}
+\contentsline {section}{\numberline {5}Anexo}{5}{section.5}
+\contentsfinish 

@@ -43,13 +43,13 @@
 % HEADING SECTIONS
 %----------------------------------------------------------------------------------------
 
-\textsc{\LARGE Universidad Carlos III de Madrid}\\[1cm] % Name of your university/college
+% \textsc{\LARGE Universidad Carlos III de Madrid}\\[1cm] % Name of your university/college
 
 %----------------------------------------------------------------------------------------
 % LOGO SECTION
 %----------------------------------------------------------------------------------------
 
-\includegraphics[width=50mm]{uc3m_logo}\\[1cm] % Include a department/university logo - this will require the graphicx package
+\includegraphics[width=100mm]{uc3m_logo}\\[1cm] % Include a department/university logo - this will require the graphicx package
 
 \textsc{\Large Algoritmos Genéticos y Evolutivos}\\[0.5cm] % Major heading such as course name
 % \textsc{\large Grupo 84}\\[2cm] % Minor heading such as course title
@@ -65,7 +65,7 @@
 %----------------------------------------------------------------------------------------
 % AUTHOR SECTION
 %----------------------------------------------------------------------------------------
-
+\vspace{6cm}
 
 % If you don't want a supervisor, uncomment the two lines below and remove the section above
 \emph{Autor:}\\[0.7cm]
@@ -90,11 +90,65 @@
 
 \newpage
 
-\section{Problema 1}
+\section{Contexto.}
+
+\subsection{Problema de las 8 reinas.}
+
+El problema de las ocho reinas consiste en poner ocho reinas en un tablero de ajedrez (de 8 casillas) sin que se amenacen
+
+En ajedrez, las reinas pueden moverse tantas casillas como quieran en cualquier dirección.
+Dado un tablero de dimensiones NxN, queremos colocar N reinas sin que se ataquen entre ellas
+
+El problema original data de 1848 y fue propuesto por el ajedrecista Max Bezzel. Durante años, muchos matemáticos (incluyendo a Gauss), han trabajado en él y lo han generalizado a N-reinas. 
+Las primeras soluciones se plantean en 1850. 
+
+Edsger Dijkstra usó este problema en 1972 para ilustrar el poder de la llamada programación estructurada. Publicó una descripción muy detallada del desarrollo del algoritmo de backtracking, "depth-first".
 
 
-\subsection{Interpretación de los datos recibidos}
+\subsection{Problema planteado.}
+Se plantea resolver el problema de las N-reinas para un valor de $N$ muy inferior a 1000 sin necesidad de hallar todas las soluciones, mediante la utilización
+de un Algoritmo Genético
 
+\section{Solucionar las N-reinas empleando fuerza bruta.}
+
+\subsection{¿Cuánto se tarda en obtener la primera solución?}
+
+\subsection{¿Cuánto se tardan en obtener soluciones subsecuentes?}
+
+\section{Solucionar las N-reinas con Algoritmos Genéticos.}
+
+\subsection{Codificación.}
+
+La codificación actual se trata de un vector de tamaño $N$ donde cada valor corresponde a la posición $x$ de una reina sobre la fila $y$ del tablero,
+siendo $y$ el índice del elemento $x$ en el vector de reinas.
+
+\subsubsection{¿Por qué es mejor que otras alternativas?}
+
+Esta codificación es mucho más eficiente que las codificaciones anteriormente propuestas (descritas abajo), ya que ocupa mucho menos espacio en memoria
+(un vector de ints ocupa $K*N$ bits, siendo $K=4$ para una arquitectura estándar de 32-bit o 64-bit, frente a la peor solución anteriormente propuesta, un vector $N*N$ binario,
+que ocuparía $N*N$ bits).
+
+Además, esta codificación lleva implícitas las restricciones de fila y columna para cada reina. La restricción fila va implícita en la propia estructura de datos
+(no puede haber dos elementos en la misma posición de la lista), y la restricción columna va implícita en el hecho de que los valores del vector son permutaciones de $N$
+(no se repite ningún valor de $x$).
+
+Esto nos elimina automáticamente muchas soluciones inválidas de la población, agilizando el algoritmo y permitiendo encontrar una solución mucho más rápidamente.
+
+\subsubsection{¿Qué otras alternativas se han barajado y descartado?}
+
+En primer lugar, se planteó una codificación del tablero como vector binario de tamaño $NxN$, de tal modo que cada individuo de la población
+fuese un vector de 0s y 1s, donde un 1 equivale a una reina en la posición equivalente del tablero, y un 0 la ausencia de ésta.
+
+En segundo lugar, se planteó un vector de reinas de tamaño $N$, donde sólo se acumulasen las reinas que se encontraban en el tablero. Dicho vector
+estaría compuesto de tuplas $(x,y)$ correspondientes a la posición de cada reina en el tablero.
+
+Al darnos cuenta de que los números $x$ e $y$ han de ser excluyentes (restricción para evitar ataques en la misma fila y columna),
+se planteó la codificación actual que hace uso del índice de la lista como posición $y$ de la reina (unívoca).
+
+\subsection{Función de fitness.}
+
+
+\subsection{Métodos}
 - Mutacion:
 1. Primera aproximación: se mutan los dos hijos con probabilidad $p_m$. Aproximación clásica: por cada bit del individuo, se evalúa su probabilidad de mutación, y se cambia el bit (0-1). Al no ser codificación binaria, lo cambiamos por valores 0-N.
 
@@ -107,9 +161,13 @@ Nota: la probabilidad de mutar depende de N, ya que el número de bits a mutar d
 
 - Cruce:
 
-\subsection{Preprocesado de los datos}
 
 \subsection{Parametrización}
+
+Parámetros propuestos, e impacto de los mismos en los 
+resultados, incluyendo 
+gráficas y 
+tablas que sean pertinentes
 
 \begin{itemize}
     \setlength\itemsep{0em}
@@ -126,40 +184,19 @@ valores posibles, como podemos ver en la siguiente figura:
 
 \begin{figure}[h]
     \center
-    \includegraphics[width=\textwidth]{graphics}
+    %\includegraphics[width=\textwidth]{graphics}
     \caption{Evolución del acierto en la clasificación según los parámetros escogidos para el entrenamiento}
     \label{}
 \end{figure}
 
 \subsection{Resultados}
 
+Resultados obtenidos y 
+número de evaluaciones
+necesarias
+
 
 \newpage
-
-\section{Problema 2}
-
-
-\begin{figure}[h]
-  \center
-    \begin{subfigure}{.4\textwidth}
-        \includegraphics[width=\textwidth]{cajero1_antecedentes}
-        \caption{Cajero 1}
-        \label{}
-    \end{subfigure}
-    \begin{subfigure}{.4\textwidth}
-        \includegraphics[width=\textwidth]{cajero2_antecedentes}
-        \caption{Cajero 2}
-        \label{}
-    \end{subfigure}
-    \begin{subfigure}{.4\textwidth}
-        \includegraphics[width=\textwidth]{cajero3_antecedentes}
-        \caption{Cajero 3}
-        \label{}
-    \end{subfigure}
-    \caption{Variación del error cuadrático medio al aumentar el número de
-    antecedentes con 3 capas ocultas}
-    \label{}
-\end{figure}
 
 
 \newpage
@@ -171,21 +208,5 @@ valores posibles, como podemos ver en la siguiente figura:
 
 
 \newcounter{atm}
-\newcounter{prediction}
-
-\forloop{atm}{1}{\value{atm} < 4}{
-    \begin{figure}[h]
-        \center
-        \forloop{prediction}{1}{\value{prediction} < 11}{
-            \begin{subfigure}{.35\textwidth}
-                \includegraphics[width=\textwidth]{cajero\arabic{atm}_prediccion/cajero\arabic{atm}_prediccion-\arabic{prediction}}
-                \caption{Predicción \arabic{prediction}}
-                \label{}
-            \end{subfigure}
-        }
-        \caption{Tendencias predichas dados los k valores anteriores para el cajero \arabic{atm}}
-        \label{}
-    \end{figure}
-}
 
 \end{document}

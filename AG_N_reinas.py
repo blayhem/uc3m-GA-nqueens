@@ -56,8 +56,8 @@ class Queens:
                 for individuo in poblacion:
                     self.check_exit(individuo)
 
-                # if(self.criterioDeParada):
-                    # break;
+                if(self.criterioDeParada):
+                    break;
 
                 '''
                 1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.
@@ -227,8 +227,8 @@ class Queens:
                 '''.format(individuo, self.evaluaciones, self.ciclos))
 
             # BOARD
-            # board = [(y, x) for (y, x) in enumerate(individuo)]
-            # self.print_board(board);
+            board = [(y, x) for (y, x) in enumerate(individuo)]
+            self.print_board(board);
 
             self.criterioDeParada = True;
 

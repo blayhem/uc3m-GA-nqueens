@@ -1,0 +1,191 @@
+\documentclass[12pt]{article}
+\usepackage{makeidx}
+\usepackage[margin=1in]{geometry}  % set the margins to 1in on all sides
+\usepackage{graphicx}              % to include figures
+\usepackage{amsmath}               % great math stuff
+\usepackage{amsfonts}              % for blackboard bold, etc
+\usepackage{amsthm}                % better theorem environments
+\usepackage{makeidx}               % index
+\usepackage[utf8]{inputenc}        % now we have tildes!
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{listings}
+\usepackage[spanish]{babel}
+\usepackage{wrapfig}
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage{titletoc}
+\usepackage{tocbibind}
+\usepackage{textcomp}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage[T1]{fontenc}
+\usepackage[many]{tcolorbox}
+\usepackage{forloop}
+\tcbuselibrary{listings}
+
+% various theorems, numbered by section
+
+\graphicspath{{static/}}
+
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\center % Center everything on the page
+
+%----------------------------------------------------------------------------------------
+% HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE Universidad Carlos III de Madrid}\\[1cm] % Name of your university/college
+
+%----------------------------------------------------------------------------------------
+% LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+\includegraphics[width=50mm]{uc3m_logo}\\[1cm] % Include a department/university logo - this will require the graphicx package
+
+\textsc{\Large Algoritmos Genéticos y Evolutivos}\\[0.5cm] % Major heading such as course name
+% \textsc{\large Grupo 84}\\[2cm] % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+% TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.4cm]
+{ \huge \bfseries Práctica 1: N Reinas.}\\[0.4cm] % Title of your document
+\HRule \\[2cm]
+
+%----------------------------------------------------------------------------------------
+% AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+\emph{Autor:}\\[0.7cm]
+
+\begin{tabular}{rl}
+    Daniel \textsc{Fernández}: &\texttt{daniel.f.rico@alumnos.uc3m.es}
+\end{tabular}\\[2cm]
+
+
+%----------------------------------------------------------------------------------------
+% DATE SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \today}\\[3cm] % Date, change the \today to a set date if you want to be precise
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with whitespace
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\section{Problema 1}
+
+
+\subsection{Interpretación de los datos recibidos}
+
+- Mutacion:
+1. Primera aproximación: se mutan los dos hijos con probabilidad $p_m$. Aproximación clásica: por cada bit del individuo, se evalúa su probabilidad de mutación, y se cambia el bit (0-1). Al no ser codificación binaria, lo cambiamos por valores 0-N.
+
+2. Segunda aproximación: con (1) obtenemos resultados repetidos, nuestra codificación es una permutación de columnas (valores 0-N). Por lo tanto, evaluamos la probabilidad del individuo entero de mutar, y si es positiva hacemos un reordenamiento de sus valores (shuffle).
+
+3. Tercera aproximación: con (2) obtenemos valores demasiado aleatorios con una probabilidad de mutación elevada. Nuestra aproximación esta vez consiste de nuevo en evaluar la probabilidad de mutación bit a bit, y en caso de ser positiva, intercambiando dicho bit con otro bit del individuo de manera aleatoria. De esta forma, en caso de mutar 1 bit, el individuo sólo diferirá del original en 2 bits.
+
+Nota: la probabilidad de mutar depende de N, ya que el número de bits a mutar depende también del tamaño del individuo, así que para hacerlo más constante tomamos la probabilidad de 1/N y la multiplicamos por la probabilidad por individuo.
+
+
+- Cruce:
+
+\subsection{Preprocesado de los datos}
+
+\subsection{Parametrización}
+
+\begin{itemize}
+    \setlength\itemsep{0em}
+    \item Capas: \textbf{3}.
+    \item Momentum: \textbf{0.2455}.
+    \item Número de ciclos: \textbf{400}.
+    \item El conjunto de datos, con un número reducido de patrones de
+    entrada, requiere un modelo con una tasa de aprendizaje alta. Se fijó este
+    valor en \textbf{0.61} y sin decaer durante el entrenamiento.
+\end{itemize}
+
+La elección de dichos parámetros se basó en una comparativa de los distintos
+valores posibles, como podemos ver en la siguiente figura:
+
+\begin{figure}[h]
+    \center
+    \includegraphics[width=\textwidth]{graphics}
+    \caption{Evolución del acierto en la clasificación según los parámetros escogidos para el entrenamiento}
+    \label{}
+\end{figure}
+
+\subsection{Resultados}
+
+
+\newpage
+
+\section{Problema 2}
+
+
+\begin{figure}[h]
+  \center
+    \begin{subfigure}{.4\textwidth}
+        \includegraphics[width=\textwidth]{cajero1_antecedentes}
+        \caption{Cajero 1}
+        \label{}
+    \end{subfigure}
+    \begin{subfigure}{.4\textwidth}
+        \includegraphics[width=\textwidth]{cajero2_antecedentes}
+        \caption{Cajero 2}
+        \label{}
+    \end{subfigure}
+    \begin{subfigure}{.4\textwidth}
+        \includegraphics[width=\textwidth]{cajero3_antecedentes}
+        \caption{Cajero 3}
+        \label{}
+    \end{subfigure}
+    \caption{Variación del error cuadrático medio al aumentar el número de
+    antecedentes con 3 capas ocultas}
+    \label{}
+\end{figure}
+
+
+\newpage
+
+\section{Conclusiones, Problemas Encontrados y Opiniones Personales}
+
+\section{Anexo}
+
+
+
+\newcounter{atm}
+\newcounter{prediction}
+
+\forloop{atm}{1}{\value{atm} < 4}{
+    \begin{figure}[h]
+        \center
+        \forloop{prediction}{1}{\value{prediction} < 11}{
+            \begin{subfigure}{.35\textwidth}
+                \includegraphics[width=\textwidth]{cajero\arabic{atm}_prediccion/cajero\arabic{atm}_prediccion-\arabic{prediction}}
+                \caption{Predicción \arabic{prediction}}
+                \label{}
+            \end{subfigure}
+        }
+        \caption{Tendencias predichas dados los k valores anteriores para el cajero \arabic{atm}}
+        \label{}
+    \end{figure}
+}
+
+\end{document}

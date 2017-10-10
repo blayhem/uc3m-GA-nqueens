@@ -101,3 +101,5 @@ ENV/
 .mypy_cache/
 
 .pdf
+report/*
+!report/report.tex

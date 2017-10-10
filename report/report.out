@@ -1,17 +1,16 @@
-\BOOKMARK [1][-]{section*.1}{\315ndice}{}% 1
-\BOOKMARK [1][-]{section.1}{Contexto.}{}% 2
-\BOOKMARK [2][-]{subsection.1.1}{Problema de las 8 reinas.}{section.1}% 3
-\BOOKMARK [2][-]{subsection.1.2}{Problema planteado.}{section.1}% 4
-\BOOKMARK [1][-]{section.2}{Solucionar las N-reinas empleando fuerza bruta.}{}% 5
-\BOOKMARK [2][-]{subsection.2.1}{\277Cu\341nto se tarda en obtener la primera soluci\363n?}{section.2}% 6
-\BOOKMARK [2][-]{subsection.2.2}{\277Cu\341nto se tardan en obtener soluciones subsecuentes?}{section.2}% 7
-\BOOKMARK [1][-]{section.3}{Solucionar las N-reinas con Algoritmos Gen\351ticos.}{}% 8
-\BOOKMARK [2][-]{subsection.3.1}{Codificaci\363n.}{section.3}% 9
-\BOOKMARK [3][-]{subsubsection.3.1.1}{\277Por qu\351 es mejor que otras alternativas?}{subsection.3.1}% 10
-\BOOKMARK [3][-]{subsubsection.3.1.2}{\277Qu\351 otras alternativas se han barajado y descartado?}{subsection.3.1}% 11
-\BOOKMARK [2][-]{subsection.3.2}{Funci\363n de fitness.}{section.3}% 12
-\BOOKMARK [2][-]{subsection.3.3}{M\351todos}{section.3}% 13
-\BOOKMARK [2][-]{subsection.3.4}{Parametrizaci\363n}{section.3}% 14
-\BOOKMARK [2][-]{subsection.3.5}{Resultados}{section.3}% 15
-\BOOKMARK [1][-]{section.4}{Conclusiones, Problemas Encontrados y Opiniones Personales}{}% 16
-\BOOKMARK [1][-]{section.5}{Anexo}{}% 17
+\BOOKMARK [1][-]{section.1}{Contexto.}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Problema de las 8 reinas.}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Problema planteado.}{section.1}% 3
+\BOOKMARK [1][-]{section.2}{Solucionar las N-reinas empleando fuerza bruta.}{}% 4
+\BOOKMARK [2][-]{subsection.2.1}{\277Cu\341nto se tarda en obtener la primera soluci\363n?}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.2}{\277Cu\341nto se tardan en obtener soluciones subsecuentes?}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{Solucionar las N-reinas con Algoritmos Gen\351ticos.}{}% 7
+\BOOKMARK [2][-]{subsection.3.1}{Codificaci\363n.}{section.3}% 8
+\BOOKMARK [3][-]{subsubsection.3.1.1}{\277Por qu\351 es mejor que otras alternativas?}{subsection.3.1}% 9
+\BOOKMARK [3][-]{subsubsection.3.1.2}{\277Qu\351 otras alternativas se han barajado y descartado?}{subsection.3.1}% 10
+\BOOKMARK [2][-]{subsection.3.2}{Funci\363n de fitness.}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.3}{M\351todos}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.4}{Parametrizaci\363n}{section.3}% 13
+\BOOKMARK [2][-]{subsection.3.5}{Resultados}{section.3}% 14
+\BOOKMARK [1][-]{section.4}{Conclusiones, Problemas Encontrados y Opiniones Personales}{}% 15
+\BOOKMARK [1][-]{section.5}{Anexo}{}% 16

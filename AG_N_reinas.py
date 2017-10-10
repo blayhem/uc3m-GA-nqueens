@@ -10,8 +10,8 @@ import progressbar
 
 class Queens:
 
-    def __init__(self, N, iter, pSize, K, L):
- 
+    def __init__(self, N, iter, pSize, K, L, u, pm, pc):
+
         if(N<4):
             print('''
                 El problema no tiene solución para n=2 o n=3.
@@ -23,6 +23,9 @@ class Queens:
         self.iter = i;
         self.K = K;
         self.L = L;
+        self.umbral = u;
+        self.pm = pm;
+        self.pc = pc;
 
         self.fitnesses = {};   # cache de evaluaciones
         self.evaluaciones = 0; # num de evaluaciones
@@ -110,9 +113,9 @@ class Queens:
                 for (r_y, r_x) in enumerate(evaluable): # resto de reinas
                     if(r_x == ind_x):
                         continue; # mismo individuo
-                    elif(r_x==ind_x 
-                      or r_y==ind_y 
-                      or r_x-r_y == ind_x-ind_y 
+                    elif(r_x==ind_x
+                      or r_y==ind_y
+                      or r_x-r_y == ind_x-ind_y
                       or r_x+r_y == ind_x+ind_y):
                         bad  += 1;
                         index = evaluable.index(ind_x)
@@ -150,17 +153,18 @@ class Queens:
         return muestra[0:L]
 
     def cruzar(self, padres):
-        pc = 0.2; # crossover probability
+        pc = self.pc; # crossover probability
         # para cada bit: coger 1 u otro del padre, o random (0,N)
         size = len(padres[0]);
         if(size != len(padres[1])):
             raise ValueError('La longitud de los padres difiere.')
 
-        for i in range(0, 2):
+        for i in range(0, len(padres)):
             if(r.uniform(0,1) < pc):
                 offspring = [];
 
                 for j in range(0, size):
+                    # adaptar para más de 2 padres
                     sel = r.randrange(0, 2);
                     number = padres[sel][j];
 
@@ -182,7 +186,7 @@ class Queens:
         return padres;
 
     def mutacion(self, individuo):
-        p = 0.5*(1/self.N);     # probabilidad de mutación
+        p = self.pm*(1/self.N);     # probabilidad de mutación
         size = len(individuo)
 
         for i in range(0, size):
@@ -258,7 +262,7 @@ u: umbral de fitness evaluation
 pm: probabilidad de mutación
 pc: probabilidad de cruce
 
-python3 AG_N_reinas.py 8 10000 100 4 2 1 1 1
+python3 AG_N_reinas.py 8 10000 100 4 2 0.001 0.2 0.5
 '''
 
 N = int(sys.argv[1])
@@ -267,11 +271,11 @@ P = int(sys.argv[3])
 K = int(sys.argv[4])
 L = int(sys.argv[5])
 
-u = int(sys.argv[6])
-pm = int(sys.argv[7])
-pc = int(sys.argv[8])
+u  = float(sys.argv[6])
+pm = float(sys.argv[7])
+pc = float(sys.argv[8])
 
-queens = Queens(N, i, P, K, L)
+queens = Queens(N, i, P, K, L, u, pm, pc)
 queens.main()
 
 # except:

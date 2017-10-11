@@ -94,20 +94,22 @@
 
 \subsection{Problema de las 8 reinas.}
 
-El problema de las ocho reinas es un problema clásico en computación y matemáticas, consiste en poner ocho reinas en un tablero de ajedrez (de 8 casillas) sin que se amenacen entre sí.
-
-En ajedrez, las reinas pueden moverse tantas casillas como quieran en cualquier dirección.
-Dado un tablero de dimensiones NxN, queremos colocar N reinas sin que se ataquen entre ellas
-
+El problema de las ocho reinas es un problema clásico en computación y matemáticas, el cual consiste en colocar ocho reinas en un tablero de ajedrez (de 8 casillas) sin que se amenacen entre sí (en ajedrez, las reinas pueden moverse tantas casillas como quieran en cualquier dirección).
+ 
 El problema original data de 1848 y fue propuesto por el ajedrecista Max Bezzel. Durante años, muchos matemáticos (incluyendo a Gauss), han trabajado en él y lo han generalizado a N-reinas. 
-Las primeras soluciones se plantean en 1850. 
+Las primeras soluciones se plantean en 1850.
 
 Edsger Dijkstra usó este problema en 1972 para ilustrar el poder de la llamada programación estructurada. Publicó una descripción muy detallada del desarrollo del algoritmo de backtracking, "depth-first".
 
+Para nuestro problema, tomaremos un enfoque más abstracto: dado un tablero de dimensiones $NxN$, queremos colocar $N$ reinas sin que se ataquen entre ellas.
+
 
 \subsection{Problema planteado.}
-Se plantea resolver el problema de las N-reinas para un valor de $N$ muy inferior a 1000 sin necesidad de hallar todas las soluciones, mediante la utilización
-de un Algoritmo Genético
+Se plantea resolver el problema de las N-reinas para un valor de $N$ muy inferior a 1000 sin necesidad de hallar todas las soluciones, mediante la utilización de un Algoritmo Genético.
+
+Primero afrontaremos el problema mediante un algoritmo de fuerza bruta con backtracking, para estudiar cuánto tarda en hallar posibles soluciones dentro del espacio de búsqueda.
+
+A continuación, se implementa un Algoritmo Genético con el fin de hallar las soluciones para valores de $N$ computacionalmente intensos.
 
 \section{Solucionar las N-reinas empleando fuerza bruta.}
 
@@ -119,44 +121,55 @@ de un Algoritmo Genético
 
 \subsection{Codificación.}
 
-La codificación actual se trata de un vector de tamaño $N$ donde cada valor corresponde a la posición $x$ de una reina sobre la fila $y$ del tablero,
-siendo $y$ el índice del elemento $x$ en el vector de reinas.
-
-\subsubsection{¿Por qué es mejor que otras alternativas?}
-
-Esta codificación es mucho más eficiente que las codificaciones anteriormente propuestas (descritas abajo), ya que ocupa mucho menos espacio en memoria
-(un vector de ints ocupa $K*N$ bits, siendo $K=4$ para una arquitectura estándar de 32-bit o 64-bit, frente a la peor solución anteriormente propuesta, un vector $N*N$ binario,
-que ocuparía $N*N$ bits).
-
-Además, esta codificación lleva implícitas las restricciones de fila y columna para cada reina. La restricción fila va implícita en la propia estructura de datos
-(no puede haber dos elementos en la misma posición de la lista), y la restricción columna va implícita en el hecho de que los valores del vector son permutaciones de $N$
-(no se repite ningún valor de $x$).
-
-Esto nos elimina automáticamente muchas soluciones inválidas de la población, agilizando el algoritmo y permitiendo encontrar una solución mucho más rápidamente.
+La codificación actual para nuestro problema trata de un vector de tamaño $N$, donde cada valor corresponde a la posición $x$ de una reina sobre la fila $y$ del tablero, siendo $y$ el índice del elemento $x$ en el vector de reinas.
 
 \subsubsection{¿Qué otras alternativas se han barajado y descartado?}
 
-En primer lugar, se planteó una codificación del tablero como vector binario de tamaño $NxN$, de tal modo que cada individuo de la población
-fuese un vector de 0s y 1s, donde un 1 equivale a una reina en la posición equivalente del tablero, y un 0 la ausencia de ésta.
+En primer lugar, se planteó una codificación del tablero como vector binario de tamaño $NxN$, de tal modo que cada individuo de la población fuese un vector de 0s y 1s, donde un 1 equivale a una reina en la posición equivalente del tablero, y un 0 la ausencia de ésta.
 
-En segundo lugar, se planteó un vector de reinas de tamaño $N$, donde sólo se acumulasen las reinas que se encontraban en el tablero. Dicho vector
-estaría compuesto de tuplas $(x,y)$ correspondientes a la posición de cada reina en el tablero.
+En segundo lugar, se planteó un vector de reinas de tamaño $N$, donde sólo se acumulasen las reinas que se encontraban en el tablero. Dicho vector estaría compuesto de tuplas $(x,y)$ correspondientes a la posición de cada reina en el tablero.
 
-Al darnos cuenta de que los números $x$ e $y$ han de ser excluyentes (restricción para evitar ataques en la misma fila y columna),
-se planteó la codificación actual que hace uso del índice de la lista como posición $y$ de la reina (unívoca).
+Al darnos cuenta de que los números $x$ e $y$ han de ser excluyentes (restricción para evitar ataques en la misma fila y columna), se planteó la codificación actual que hace uso del índice de la lista como posición $y$ de la reina (valor unívoco).
+
+\subsubsection{¿Por qué la codificación actual es mejor que las otras?}
+
+Esta codificación es mucho más eficiente que las codificaciones anteriormente propuestas, ya que ocupa mucho menos espacio en memoria (un vector de ints ocupa $K*N$ bits, siendo $K=4$ para una arquitectura estándar de 32-bit o 64-bit, frente a la peor solución anteriormente propuesta, un vector $N*N$ binario, que ocuparía $N*N$ bits).
+
+Además, esta codificación lleva implícitas las restricciones de fila y columna para cada reina. La restricción fila va implícita en la propia estructura de datos (no puede haber dos elementos en la misma posición de la lista), y la restricción columna va implícita en el hecho de que los valores del vector son permutaciones de $N$ (no se repite ningún valor de $x$).
+
+Esto nos elimina automáticamente muchas soluciones inválidas de la población, agilizando el algoritmo y permitiendo encontrar una solución mucho más rápidamente.
 
 \subsection{Función de fitness.}
 
+Se plantean dos funciones de fitness para el problema a tratar:
 
-\subsection{Métodos}
-- Mutacion:
-1. Primera aproximación: se mutan los dos hijos con probabilidad $p_m$. Aproximación clásica: por cada bit del individuo, se evalúa su probabilidad de mutación, y se cambia el bit (0-1). Al no ser codificación binaria, lo cambiamos por valores 0-N.
+\begin{enumerate}
+    \item En primer lugar, y considerando que no llegamos a posicionar $N$ número de reinas, se considera la función $F=\frac{n}{N} - \frac{b}{n}$, siendo $n$ el número total de reinas posicionadas sobre el tablero frente a $N$ (número ideal de reinas y dimensión del lado del tablero), y $b$ el número de reinas mal posicionadas. Esta función vale 1 cuando todas las reinas están bien posicionadas, y 0 cuando están todas mal posicionadas, o no hay reinas sobre el tablero.
+    \item Considerando que, debido a nuestra codificación, no existe la posibilidad de que $n$ sea distinta de $N$ (siempre hay $N$ reinas sobre el tablero, aunque estén mal situadas), se propone la función $F=1-\frac{b}{N}$, que no es más que una substitución de $n=N$ en la función propuesta anteriormente. Esta es la función implementada.
+\end{enumerate}
 
-2. Segunda aproximación: con (1) obtenemos resultados repetidos, nuestra codificación es una permutación de columnas (valores 0-N). Por lo tanto, evaluamos la probabilidad del individuo entero de mutar, y si es positiva hacemos un reordenamiento de sus valores (shuffle).
+\subsection{Métodos implementados}
 
-3. Tercera aproximación: con (2) obtenemos valores demasiado aleatorios con una probabilidad de mutación elevada. Nuestra aproximación esta vez consiste de nuevo en evaluar la probabilidad de mutación bit a bit, y en caso de ser positiva, intercambiando dicho bit con otro bit del individuo de manera aleatoria. De esta forma, en caso de mutar 1 bit, el individuo sólo diferirá del original en 2 bits.
+\subsubsection{Selección}
 
-Nota: la probabilidad de mutar depende de N, ya que el número de bits a mutar depende también del tamaño del individuo, así que para hacerlo más constante tomamos la probabilidad de 1/N y la multiplicamos por la probabilidad por individuo.
+El método de selección aplicado para nuestro problema es una selección por torneo.
+
+
+
+Se define un tamaño de torneo(T ) y se seleccionan T individuos de forma aleatoria uniforme.
+De entre esos individuos se elige el mejor.
+Se repite el proceso tantas veces como individuos queramos seleccionar
+
+\subsubsection{Mutación}
+
+\begin{enumerate}
+    \item Primera aproximación: se mutan los dos hijos con probabilidad $p_m$. Aproximación clásica: por cada bit del individuo, se evalúa su probabilidad de mutación, y se cambia el bit (0-1). Al no ser codificación binaria, lo cambiamos por valores 0-N.
+    \item Segunda aproximación: con (1) obtenemos resultados repetidos, nuestra codificación es una permutación de columnas (valores 0-N). Por lo tanto, evaluamos la probabilidad del individuo entero de mutar, y si es positiva hacemos un reordenamiento de sus valores (shuffle).
+    \item Tercera aproximación: con (2) obtenemos valores demasiado aleatorios con una probabilidad de mutación elevada. Nuestra aproximación esta vez consiste de nuevo en evaluar la probabilidad de mutación bit a bit, y en caso de ser positiva, intercambiando dicho bit con otro bit del individuo de manera aleatoria. De esta forma, en caso de mutar 1 bit, el individuo sólo diferirá del original en 2 bits.
+    
+\end{enumerate}
+\textbf{Nota:}
+la probabilidad de mutar depende de N, ya que el número de bits a mutar depende también del tamaño del individuo, así que para hacerlo más constante tomamos la probabilidad de 1/N y la multiplicamos por la probabilidad por individuo.
 
 
 - Cruce:

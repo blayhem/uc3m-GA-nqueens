@@ -32,14 +32,13 @@ class Queens:
         self.pm = pm;
         self.pc = pc;3
 
-        # valores de fitness para el mejor individuo.
+        # GRAPHICS - valores de fitness para el mejor individuo
         self.fvalues = [];
 
         self.fitnesses = {};   # cache de evaluaciones
         self.evaluaciones = 0; # num de evaluaciones
         self.ciclos = 0;       # num de ciclos de evaluación
         self.criterioDeParada = False;
-
         self.solutions = [];
 
         '''
@@ -56,8 +55,7 @@ class Queens:
     def main(self):
         bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
-        while ( self.ciclos < self.iter): # and not self.criterioDeParada ):
-        # for i in range(0, self.iter):
+        while ( self.ciclos < self.iter):
             try:
                 bar.update((self.ciclos*100)/self.iter)
                 '''
@@ -67,7 +65,7 @@ class Queens:
                 for individuo in poblacion:
                     self.check_exit(individuo)
 
-                # mejor fitness de toda la población: for plotting reasons
+                # GRAPHICS - mejor fitness de toda la población
                 self.fvalues.append(max(self.fitnesses.values()))
 
                 if(self.criterioDeParada):
@@ -86,7 +84,6 @@ class Queens:
                 self.cruce nos devuelve 4 individuos, 2 padres y 2 hijos.
                 '''
                 nuevaPoblacion = self.cruzar(padres);
-                # print('despues de cruce: \t', nuevaPoblacion)
 
                 '''
                 3. Mutamos la nueva poblacion.
@@ -94,7 +91,6 @@ class Queens:
                 '''
                 nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), nuevaPoblacion));
                 # nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), padres));
-                # print('con mutacion: \t', nuevaPoblacion)
                 poblacion += nuevaPoblacion;
                 self.ciclos += 1;
 

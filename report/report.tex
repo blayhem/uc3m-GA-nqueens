@@ -172,6 +172,23 @@ El cruce que se implementa es una recombinación discreta entre los dos padres c
 
 Se genera un descendiente eligiendo un gen de cada progenitor de forma aleatoria
 
+\textbf Métodos de cruce:
+
+\begin{enumerate}
+    \item Partially matched crossover (PMX): In this method, two crossover points are selected at random and PMX proceeds by position wise exchanges. The two crossover points give matching selection. It affects cross by position-by-position exchange operations. In this method parents are mapped to each other, hence we can also call it partially mapped crossover.
+    \item Cycle crossover (CX): Beginning at any gene $i$ in parent 1, the $i$-th gene in parent 2 becomes replaced by it. The same is repeated for the displaced gene until the gene which is equal to the first inserted gene becomes replaced (cycle).
+    \item Order crossover operator (OX1): A portion of one parent is mapped to a portion of the other parent. From the replaced portion on, the rest is filled up by the remaining genes, where already present genes are omitted and the order is preserved.
+    \item Otros: 
+    \begin{enumerate}
+        \item order-based crossover operator (OX2)
+        \item position-based crossover operator (POS)
+        \item voting recombination crossover operator (VR)
+        \item alternating-position crossover operator (AP)
+        \item sequential constructive crossover operator (SCX)
+    \end{enumerate}
+\end{enumerate}
+
+
 \subsubsection{Mutación}
 
 \begin{enumerate}
@@ -188,6 +205,12 @@ la probabilidad de mutar depende de N, ya que el número de bits a mutar depende
 
 
 \subsection{Parametrización}
+
+De Jong's experiments indicated that the best population size was 50–100 individuals, the best single−point crossover rate was ~0.6 per pair of parents, and the best mutation rate was 0.001 per bit - De Jong (1975) mencionado en \emph{An Introduction to Genetic Algorithms} (Melanie, M. 1996) 
+
+Nota:  Grefenstette (1986) noted that, since the GA could be used as an optimization procedure, it could be used to optimize the parameters for another GA! (A similar study was done by Bramlette (1991).) In Grefenstette's experiments, the "meta−level GA" evolved a population of 50 GA parameter sets for the problems in De Jong's test suite. Each individual encoded six GA parameters: population size, crossover rate, mutation rate, generation gap, scaling window (a particular scaling technique that I won't discuss here), and selection strategy (elitist or nonelitist).
+
+Result: These settings were similar to those found by Grefenstette: population size 20–30, crossover rate 0.75–0.95, and mutation rate 0.005–0.01
 
 Parámetros propuestos, e impacto de los mismos en los 
 resultados, incluyendo 
@@ -219,6 +242,15 @@ valores posibles, como podemos ver en la siguiente figura:
 Resultados obtenidos y 
 número de evaluaciones
 necesarias
+
+Nota: tiempos de ejecución del algoritmo principal con parámetros por defecto (en ms):
+Params: python3 AG_N_reinas.py 16 100000 200 4 2 0.001 0.4 0.8
+
+Tiempo init:  3.2100677490234375
+Tiempo evaluacion:  1.2519359588623047
+Tiempo selección:  0.07486343383789062
+Tiempo cruce:  0.1010894775390625
+Tiempo mutación:  0.06699562072753906
 
 
 \newpage

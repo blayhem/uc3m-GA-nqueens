@@ -7,6 +7,8 @@ import math
 import functools as ft
 # https://pypi.python.org/pypi/progressbar2
 import progressbar
+import matplotlib.pyplot as plt
+
 
 class Queens:
 
@@ -19,13 +21,19 @@ class Queens:
                 http://penguin.ewu.edu/~trolfe/QueenLasVegas/Hoffman.pdf
                 ''')
             exit()
+        '''
+        Parámetros básicos
+        '''
         self.N = N;
         self.iter = i;
         self.K = K;
         self.L = L;
         self.umbral = u;
         self.pm = pm;
-        self.pc = pc;
+        self.pc = pc;3
+
+        # valores de fitness para el mejor individuo.
+        self.fvalues = [];
 
         self.fitnesses = {};   # cache de evaluaciones
         self.evaluaciones = 0; # num de evaluaciones
@@ -58,6 +66,9 @@ class Queens:
                 '''
                 for individuo in poblacion:
                     self.check_exit(individuo)
+
+                # mejor fitness de toda la población: for plotting reasons
+                self.fvalues.append(max(self.fitnesses.values()))
 
                 if(self.criterioDeParada):
                     break;
@@ -95,6 +106,13 @@ class Queens:
             print('\nNo solution found. ', self.evaluaciones, 'evaluaciones')
         else:
             print(len(self.solutions), 'soluciones encontradas')
+
+        plt.plot(self.fvalues)
+        title = 'N={}, K={}, L={}, p. de mutación={}, p. de cruce={}'.format(self.N, self.K, self.L, self.pm, self.pc)
+        plt.title(title)
+        plt.ylabel('fitness')
+        plt.xlabel('iteraciones')
+        plt.show()
 
     def getFitness(self, individuo):
         # self.print_board([(y, x) for (y, x) in enumerate(individuo)]);

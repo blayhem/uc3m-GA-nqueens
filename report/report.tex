@@ -154,11 +154,23 @@ Se plantean dos funciones de fitness para el problema a tratar:
 
 El método de selección aplicado para nuestro problema es una selección por torneo.
 
+Para esta selección tomamos un parámetro $K$ que se corresponde con el tamaño de la muestra de población que tomamos para nuestro torneo. A continuación, evaluamos la muestra y seleccionamos al mejor individuo un número de veces definido por el parámetro $L$.
 
+Originalmente, se implementa el método de selección sugerido en el libro \emph{An Introduction to Genetic Algorithms} (Melanie, M. 1996), en el cual la selección por torneo ordenaba la muestra de tamaño $K$ por su grado de fitness, y seleccionaba los dos mejores como padres de la nueva población. Por razones de simplificación, se decide que el corte se realiza en $L$, quedando por defecto un tamaño de muestra $K$ y un tamaño de ganadores del torneo de $L$.
 
-Se define un tamaño de torneo(T ) y se seleccionan T individuos de forma aleatoria uniforme.
-De entre esos individuos se elige el mejor.
-Se repite el proceso tantas veces como individuos queramos seleccionar
+Sin embargo, se llegó a la conclusión de que era mejor repetir el proceso de torneo $L$ veces hasta conseguir el número deseado de padres.
+
+...desarrollar
+
+[GRÁFICOS para demostrarlo]
+
+El método de selección escogido va acompañado de la política de reemplazo.
+
+\subsubsection{Cruce}
+
+El cruce que se implementa es una recombinación discreta entre los dos padres con cuidado de no repetir ninguno de los anteriores valores de $N$ 
+
+Se genera un descendiente eligiendo un gen de cada progenitor de forma aleatoria
 
 \subsubsection{Mutación}
 

@@ -48,7 +48,7 @@ class Queens:
         orderedList = [i for i in range(0,N)]
         for p in range(0, pSize):
             r.shuffle(orderedList)
-            poblacion.append(orderedList);
+            poblacion.append(orderedList[:]);
 
         self.poblacion = poblacion;
 
@@ -73,17 +73,16 @@ class Queens:
 
                 '''
                 1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.
+                Padres siempre es un número par, de tamaño L*2, donde L es el número de hijos.
                 '''
-                padres = self.seleccion(poblacion);
-                # 2 torneos mejor que 1 torneo doble?
-                # padres += padres;
-
+                padres = [self.seleccion(poblacion, i%2==0) for i in range(0,2*self.L)]
                 '''
                 2. Hacemos cruce con reemplazo, los padres vuelven a la poblacion
                 porque K=4 pero L=2 (perdemos 2 individuos).
                 self.cruce nos devuelve 4 individuos, 2 padres y 2 hijos.
                 '''
-                nuevaPoblacion = self.cruzar(padres);
+                # nuevaPoblacion = self.cruzar(padres);
+                nuevaPoblacion = self.cruce_SCX(padres);
 
                 '''
                 3. Mutamos la nueva poblacion.
@@ -144,27 +143,51 @@ class Queens:
         self.fitnesses[key] = fitness
         return fitness;
 
-    def seleccion(self, poblacion):
+    def seleccion(self, poblacion, reemplazo):
         K = self.K;
         L = self.L;
-        return self.torneo(poblacion, K, L);
+        return self.torneo2(poblacion, K, reemplazo);
 
     def torneo(self, poblacion, K, L):
         muestra = []
-        taken = []
+        # taken = []
         reverse = False;
         '''
         Construimos la muestra K a partir de poblacion
         '''
         for i in range(0,K):
             sel = r.randrange(0,len(poblacion))
-            while(sel in taken):
-                sel = r.randrange(0,len(poblacion));
+            # while(sel in taken):
+            #     sel = r.randrange(0,len(poblacion));
             muestra.append(poblacion.pop(sel));
-            taken.append(sel);
+            # taken.append(sel);
 
         muestra.sort(key=self.getFitness, reverse=reverse)
         return muestra[0:L]
+
+    def torneo2(self, poblacion, K, reemplazo):
+        muestra = []
+        taken = []
+        luck = 0.75;
+
+        for i in range(0,K):
+            sel = r.randrange(0,len(poblacion))
+            # print(sel, poblacion[sel])
+            while(sel in taken):
+                sel = r.randrange(0,len(poblacion));
+            muestra.append(poblacion[sel]);
+            taken.append(sel);
+
+        # muestra de tamaño K, ordenada de mayor a menor fitness
+        muestra.sort(key=self.getFitness, reverse=True)
+        # quitamos el peor individuo de K que reemplazaremos con el hijo de los 2 padres
+        if(reemplazo):
+            poblacion.pop(poblacion.index(muestra.pop()))
+
+        if(r.uniform(0, 1) < luck):
+            return muestra[0]
+        else:
+            return muestra[1]
 
     def cruzar(self, padres):
         pc = self.pc; # crossover probability
@@ -198,6 +221,69 @@ class Queens:
             padres.append(offspring)
 
         return padres;
+
+    def cruce_SCX(self, padres):
+        offspring = []
+
+        for i in range(0, int(len(padres)/2)):
+            # para cada par de padres:
+            p1 = padres[i*2]
+            p2 = padres[(i*2)+1]
+            hijo = []
+
+            if(len(p1) != len(p2) or len(p1) != N):
+                raise ValueError('La longitud de los padres difiere.')
+
+            for bit in range(0,self.N):
+                if(bit==0):
+                    # inicializamos el primer locus del hijo
+                    hijo.append(p1[bit])
+                else:
+                    # (x, y) = (hijo[bit-1], bit-1) # coordenadas de la reina anterior
+                    try:
+                        # opt1_x es el valor siguiente al valor actual del hijo, en el padre1
+                        (opt1_x, opt1_y) = (p1[p1.index(hijo[bit-1])+1], bit)
+                    except IndexError as e:
+                        (opt1_x, opt1_y) = (bit, bit)
+
+                    try:
+                        # opt2_x es el valor siguiente al valor actual del hijo, en el padre2
+                        (opt2_x, opt2_y) = (p2[p2.index(hijo[bit-1])+1], bit)
+                    except IndexError as e:
+                        (opt2_x, opt2_y) = (bit, bit)
+
+                    (opt3_x, opt3_y) = (bit, bit)
+                    (eval1, eval2, eval3) = (0, 0, 0)
+
+                    # son incidentes las reinas propuestas por el padre 1, el padre 2, y la lista ordenada?
+                    for (y, x) in enumerate(hijo):
+                        if(opt1_x==x or opt1_y==y or opt1_x-opt1_y == x-y or opt1_x+opt1_y == x+y):
+                            eval1 += 1;
+
+                        if(opt2_x==x or opt2_y==y or opt2_x-opt2_y == x-y or opt2_x+opt2_y == x+y):
+                            eval2 += 1;
+
+                        if(opt3_x==x or opt3_y==y or opt3_x-opt3_y == x-y or opt3_x+opt3_y == x+y):
+                            eval3 += 1;
+
+                    bestEval = ['eval1', 'eval2', 'eval3'][[eval1, eval2, eval3].index(min([eval1, eval2, eval3]))]
+                    if(bestEval=='eval1' and opt1_x not in hijo):
+                        hijo.append(opt1_x)
+                    elif(bestEval=='eval2' and opt2_x not in hijo):
+                        hijo.append(opt2_x)
+                    elif(bestEval=='eval3' and opt3_x not in hijo):
+                        hijo.append(opt3_x)
+                    else:
+                        n = r.randrange(0,self.N)
+                        while(n in hijo):
+                            n = r.randrange(0,self.N)
+                        hijo.append(n)
+
+            offspring.append(hijo)
+            # TODO: EL HIJO ES LITERALMENTE EL PADRE1
+        print('\nPadres: ', padres)
+        print('\nHijos: ', offspring)
+
 
     def mutacion(self, individuo):
         p = self.pm*(1/self.N);     # probabilidad de mutación

@@ -26,6 +26,9 @@ class Queens:
         '''
         self.N = N;
         self.iter = i;
+        if(K>N):
+            print('El tamaño de muestra de torneo tiene que ser menor que la población')
+            raise ValueError
         self.K = K;
         self.L = L;
         self.umbral = u;
@@ -41,6 +44,10 @@ class Queens:
         self.criterioDeParada = False;
         self.solutions = [];
 
+        # diversity index
+        self.bestValue = 9999;
+        self.diversityIndex = 1
+
         '''
         Inicialización de la población:
         '''
@@ -55,21 +62,10 @@ class Queens:
     def main(self):
         bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
+        backup = []
         while ( self.ciclos < self.iter):
             try:
                 bar.update((self.ciclos*100)/self.iter)
-                '''
-                0. Calculamos fitness de la poblacion para revisar el criterio
-                de parada
-                '''
-                for individuo in poblacion:
-                    self.check_exit(individuo)
-
-                # GRAPHICS - mejor fitness de toda la población
-                self.fvalues.append(max(self.fitnesses.values()))
-
-                if(self.criterioDeParada):
-                    break;
 
                 '''
                 1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.
@@ -83,7 +79,6 @@ class Queens:
                 '''
                 # nuevaPoblacion = self.cruzar(padres);
                 nuevaPoblacion = self.cruce_SCX(padres);
-
                 '''
                 3. Mutamos la nueva poblacion.
                 Politica opcional: if son has clone in poblacion, do not add.
@@ -92,6 +87,35 @@ class Queens:
                 # nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), padres));
                 poblacion += nuevaPoblacion;
                 self.ciclos += 1;
+                '''
+                4. Calculamos fitness de la poblacion para revisar el criterio
+                de parada
+                '''
+                for individuo in poblacion:
+                    self.check_exit(individuo)
+
+                # GRAPHICS - mejor fitness de toda la población
+                bestValue = max(self.fitnesses.values())
+                if(bestValue==1):
+                    print('\nsolution found!', self.criterioDeParada)
+                    break;
+                if(bestValue == self.bestValue):
+                    self.diversityIndex += 0.01
+                    # print(self.diversityIndex, bestValue)
+                    if(self.diversityIndex>50):
+                        poblacion = backup[:]
+                    else:
+                        backup = poblacion[:]
+                        
+                else:
+                    print(self.diversityIndex, bestValue)
+                    self.diversityIndex = 1;
+                    self.bestValue = bestValue;
+                
+                self.fvalues.append(bestValue)
+                
+                if(self.criterioDeParada):
+                    break;
 
             except KeyboardInterrupt:
                 print('RTL+C. Parando.')
@@ -190,6 +214,7 @@ class Queens:
             return muestra[1]
 
     def cruzar(self, padres):
+        print(padres)
         pc = self.pc; # crossover probability
         # para cada bit: coger 1 u otro del padre, o random (0,N)
         size = len(padres[0]);
@@ -217,9 +242,9 @@ class Queens:
 
             else:
                 offspring = padres[i]
-
             padres.append(offspring)
-
+        print(padres)
+        print(list(map(lambda i: self.getFitness(i), padres)))
         return padres;
 
     def cruce_SCX(self, padres):
@@ -237,7 +262,7 @@ class Queens:
             for bit in range(0,self.N):
                 if(bit==0):
                     # inicializamos el primer locus del hijo
-                    hijo.append(p1[bit])
+                    hijo.append(p2[bit])
                 else:
                     # (x, y) = (hijo[bit-1], bit-1) # coordenadas de la reina anterior
                     try:
@@ -280,13 +305,18 @@ class Queens:
                         hijo.append(n)
 
             offspring.append(hijo)
-            # TODO: EL HIJO ES LITERALMENTE EL PADRE1
-        print('\nPadres: ', padres)
-        print('\nHijos: ', offspring)
+
+        # añadimos primero los hijos para que a igual fitness devuelva hijos, no padres
+        familia = offspring+padres;
+        familia.sort(key=self.getFitness, reverse=True)
+
+        # devolvemos los hijos excepto cuando su valor es peor que el de los padres
+        return familia[:len(offspring)]
+        # return offspring
 
 
     def mutacion(self, individuo):
-        p = self.pm*(1/self.N);     # probabilidad de mutación
+        p = self.diversityIndex*self.pm*self.N;     # probabilidad de mutación
         size = len(individuo)
 
         for i in range(0, size):
@@ -320,7 +350,7 @@ class Queens:
     def check_exit(self, individuo):
         umbral = 0.001
         fitness = self.getFitness(individuo);
-        if(fitness >= 1-umbral and individuo not in self.solutions):
+        if(fitness == 1):#  and individuo not in self.solutions):
             self.solutions.append(individuo);
 
             # STATS

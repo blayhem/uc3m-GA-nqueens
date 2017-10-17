@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 class Queens:
 
-    def __init__(self, N, iter, pSize, K, L, u, pm, pc):
+    def __init__(self, N, iter, pSize, K, L, pm, pc):
 
         if(N<4):
             print('''
@@ -21,23 +21,28 @@ class Queens:
                 http://penguin.ewu.edu/~trolfe/QueenLasVegas/Hoffman.pdf
                 ''')
             exit()
+
+        elif(K>pSize):
+            print('El tamaño de muestra de torneo (', K,')tiene que ser menor que el tamaño de población (', pSize, ')')
+            exit()
+
         '''
         Parámetros básicos
         '''
         self.N = N;
         self.iter = i;
-        if(K>N):
-            print('El tamaño de muestra de torneo tiene que ser menor que la población')
-            raise ValueError
+        
         self.K = K;
         self.L = L;
-        self.umbral = u;
         self.pm = pm;
-        self.pc = pc;3
+        self.pc = pc;
 
         # GRAPHICS - valores de fitness para el mejor individuo
         self.fvalues = [];
 
+        '''
+        Parámetros internos
+        '''
         self.fitnesses = {};   # cache de evaluaciones
         self.evaluaciones = 0; # num de evaluaciones
         self.ciclos = 0;       # num de ciclos de evaluación
@@ -58,11 +63,12 @@ class Queens:
             poblacion.append(orderedList[:]);
 
         self.poblacion = poblacion;
+        # print(min(list(map(lambda i: self.getFitness(i), poblacion))))
 
     def main(self):
         bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
-        backup = []
+        # backup = []
         while ( self.ciclos < self.iter):
             try:
                 bar.update((self.ciclos*100)/self.iter)
@@ -77,8 +83,11 @@ class Queens:
                 porque K=4 pero L=2 (perdemos 2 individuos).
                 self.cruce nos devuelve 4 individuos, 2 padres y 2 hijos.
                 '''
-                # nuevaPoblacion = self.cruzar(padres);
-                nuevaPoblacion = self.cruce_SCX(padres);
+                # nuevaPoblacion = self.cruce_SCX(padres);
+                nuevaPoblacion = self.cruce_OC1(padres);
+                # REEMPLAZO:
+                # poblacion = poblacion[self.L:]
+                poblacion = poblacion[self.L*2:]
                 '''
                 3. Mutamos la nueva poblacion.
                 Politica opcional: if son has clone in poblacion, do not add.
@@ -96,19 +105,17 @@ class Queens:
 
                 # GRAPHICS - mejor fitness de toda la población
                 bestValue = max(self.fitnesses.values())
-                if(bestValue==1):
-                    print('\nsolution found!', self.criterioDeParada)
-                    break;
+                # print('Best individual fitness: ', bestValue, 'worst individual fitness: ', min(self.fitnesses.values()), 'diversityIndex: ', int(self.diversityIndex))
                 if(bestValue == self.bestValue):
                     self.diversityIndex += 0.01
-                    # print(self.diversityIndex, bestValue)
-                    if(self.diversityIndex>50):
-                        poblacion = backup[:]
-                    else:
-                        backup = poblacion[:]
-                        
+                    if(self.diversityIndex>10):
+                        # poblacion = backup[:]
+                        self.diversityIndex = 1;
+                    # else:
+                        # backup = poblacion[:]
+                    # TODO: pseudo-backtracking
+
                 else:
-                    print(self.diversityIndex, bestValue)
                     self.diversityIndex = 1;
                     self.bestValue = bestValue;
                 
@@ -117,12 +124,17 @@ class Queens:
                 if(self.criterioDeParada):
                     break;
 
+                if(bestValue==1):
+                    for individuo in poblacion:
+                        self.check_exit(individuo)
+                    # print('\nsolution found!', self.criterioDeParada)
+
             except KeyboardInterrupt:
                 print('RTL+C. Parando.')
                 break
 
         if(len(self.solutions) == 0):
-            print('\nNo solution found. ', self.evaluaciones, 'evaluaciones')
+            print('\nNo solution found. ', self.evaluaciones, 'evaluaciones', 'máximo fitness: ', self.bestValue, 'en ', self.ciclos, 'iteraciones')
         else:
             print(len(self.solutions), 'soluciones encontradas')
 
@@ -146,18 +158,20 @@ class Queens:
             evaluable = individuo[:] # copia por valor
             self.evaluaciones += 1;
             bad = 0;
-            for (ind_y, ind_x) in enumerate(evaluable): # posiciones de reinas
-                for (r_y, r_x) in enumerate(evaluable): # resto de reinas
-                    if(r_x == ind_x):
+            for (ind_y, ind_x) in enumerate(individuo): # posiciones de reinas
+                # for (r_y, r_x) in enumerate(individuo): # resto de reinas
+                for(r_y) in range(ind_y+1, len(individuo)):
+                    r_x = individuo[r_y]
+                    if(r_y == ind_y):
                         continue; # mismo individuo
                     elif(r_x==ind_x
                       or r_y==ind_y
                       or r_x-r_y == ind_x-ind_y
                       or r_x+r_y == ind_x+ind_y):
                         bad  += 1;
-                        index = evaluable.index(ind_x)
-                        evaluable.pop(index); # quitamos 1 reina adyacente para tener solo 1 arista
-                        break
+                        
+                index = evaluable.index(ind_x)
+                evaluable.pop(index); # quitamos 1 reina adyacente para tener solo 1 arista
 
         # return (n/N - bad/n)
         if(bad == 0):
@@ -196,7 +210,6 @@ class Queens:
 
         for i in range(0,K):
             sel = r.randrange(0,len(poblacion))
-            # print(sel, poblacion[sel])
             while(sel in taken):
                 sel = r.randrange(0,len(poblacion));
             muestra.append(poblacion[sel]);
@@ -204,17 +217,14 @@ class Queens:
 
         # muestra de tamaño K, ordenada de mayor a menor fitness
         muestra.sort(key=self.getFitness, reverse=True)
-        # quitamos el peor individuo de K que reemplazaremos con el hijo de los 2 padres
-        if(reemplazo):
-            poblacion.pop(poblacion.index(muestra.pop()))
 
         if(r.uniform(0, 1) < luck):
             return muestra[0]
         else:
             return muestra[1]
 
-    def cruzar(self, padres):
-        print(padres)
+    def cruce_SCX_random(self, padres):
+        hijos = []
         pc = self.pc; # crossover probability
         # para cada bit: coger 1 u otro del padre, o random (0,N)
         size = len(padres[0]);
@@ -227,25 +237,24 @@ class Queens:
 
                 for j in range(0, size):
                     # adaptar para más de 2 padres
-                    sel = r.randrange(0, 2);
+                    sel = r.randrange(0, len(padres));
                     number = padres[sel][j];
 
-                    if(number in offspring):    # si el valor se repite
-                        opt = [0,1]
+                    opt = [i for i in range(0,len(padres))]
+                    while(number in offspring):    # si el valor se repite
                         opt.pop(opt.index(sel)) # quitamos el anterior
-                        sel = opt[0]            # actualizamos sel con el otro valor
+                        sel = opt[r.randrange(0, len(opt))]
                         number = padres[sel][j] # cogemos el valor del otro padre
-
-                        while(number in offspring): # caso raro: ambos valores repetidos
+                        if(len(opt)==1):
                             number = r.randrange(0, self.N);
+                            break;
                     offspring.append(number)
 
             else:
                 offspring = padres[i]
-            padres.append(offspring)
-        print(padres)
-        print(list(map(lambda i: self.getFitness(i), padres)))
-        return padres;
+            hijos.append(offspring)
+        return hijos[:self.L]
+        # return padres;
 
     def cruce_SCX(self, padres):
         offspring = []
@@ -261,16 +270,13 @@ class Queens:
 
             for bit in range(0,self.N):
                 if(bit==0):
-                    # inicializamos el primer locus del hijo
                     hijo.append(p2[bit])
                 else:
-                    # (x, y) = (hijo[bit-1], bit-1) # coordenadas de la reina anterior
                     try:
                         # opt1_x es el valor siguiente al valor actual del hijo, en el padre1
                         (opt1_x, opt1_y) = (p1[p1.index(hijo[bit-1])+1], bit)
                     except IndexError as e:
                         (opt1_x, opt1_y) = (bit, bit)
-
                     try:
                         # opt2_x es el valor siguiente al valor actual del hijo, en el padre2
                         (opt2_x, opt2_y) = (p2[p2.index(hijo[bit-1])+1], bit)
@@ -280,7 +286,6 @@ class Queens:
                     (opt3_x, opt3_y) = (bit, bit)
                     (eval1, eval2, eval3) = (0, 0, 0)
 
-                    # son incidentes las reinas propuestas por el padre 1, el padre 2, y la lista ordenada?
                     for (y, x) in enumerate(hijo):
                         if(opt1_x==x or opt1_y==y or opt1_x-opt1_y == x-y or opt1_x+opt1_y == x+y):
                             eval1 += 1;
@@ -311,16 +316,42 @@ class Queens:
         familia.sort(key=self.getFitness, reverse=True)
 
         # devolvemos los hijos excepto cuando su valor es peor que el de los padres
-        return familia[:len(offspring)]
-        # return offspring
+        # return familia[:len(offspring)]
+        return offspring
+
+    def cruce_OC1(self, padres):
+        offspring = []
+
+        for i in range(0, int(len(padres)/2)):
+            # para cada par de padres:
+            p1 = padres[i*2]
+            p2 = padres[(i*2)+1]
+            size = len(p1)
+            if(size != len(p2) or size != N):
+                raise ValueError('La longitud de los padres difiere.')
+
+            cut1 = r.randrange(0,size/2)
+            cut2 = r.randrange(0,size/2)
+
+            cSection = p1[cut1:cut1+int(size/2)]
+            other    = list(filter(lambda n: n not in cSection, p2))
+            hijo1 = other[:cut1] + cSection + other[cut1:]
+            offspring.append(hijo1)
+
+            cSection = p2[cut2:cut2+int(size/2)]
+            other    = list(filter(lambda n: n not in cSection, p1))
+            hijo2 = other[:cut2] + cSection + other[cut2:]
+            offspring.append(hijo2)
+
+        return offspring
 
 
     def mutacion(self, individuo):
-        p = self.diversityIndex*self.pm*self.N;     # probabilidad de mutación
+        p = self.diversityIndex*self.pm #*self.N;     # probabilidad de mutación
         size = len(individuo)
 
-        for i in range(0, size):
-            if(r.uniform(0, 1) < p):
+        if(r.uniform(0, 1) < p):
+            for i in range(0, size):
                 j = r.randrange(0, size);
                 prev = individuo[i]
                 individuo[i] = individuo[j]
@@ -348,17 +379,17 @@ class Queens:
             self.print_line(n)
 
     def check_exit(self, individuo):
-        umbral = 0.001
         fitness = self.getFitness(individuo);
-        if(fitness == 1):#  and individuo not in self.solutions):
+        if(fitness == 1 and individuo not in self.solutions):
             self.solutions.append(individuo);
 
             # STATS
             print('''
+                PARA N = {}
                 SOLUTION FOUND: {}
                 {} evaluaciones,
                 {} ciclos
-                '''.format(individuo, self.evaluaciones, self.ciclos))
+                '''.format(self.N, individuo, self.evaluaciones, self.ciclos))
 
             # BOARD
             board = [(y, x) for (y, x) in enumerate(individuo)]
@@ -392,7 +423,7 @@ u: umbral de fitness evaluation
 pm: probabilidad de mutación
 pc: probabilidad de cruce
 
-python3 AG_N_reinas.py 8 10000 100 4 2 0.001 0.2 0.5
+python3 AG_N_reinas.py 8 20000 100 20 10 0.1 0.9
 '''
 
 N = int(sys.argv[1])
@@ -401,11 +432,10 @@ P = int(sys.argv[3])
 K = int(sys.argv[4])
 L = int(sys.argv[5])
 
-u  = float(sys.argv[6])
-pm = float(sys.argv[7])
-pc = float(sys.argv[8])
+pm = float(sys.argv[6])
+pc = float(sys.argv[7])
 
-queens = Queens(N, i, P, K, L, u, pm, pc)
+queens = Queens(N, i, P, K, L, pm, pc)
 queens.main()
 
 # except:

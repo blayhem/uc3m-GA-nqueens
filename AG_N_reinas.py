@@ -397,7 +397,6 @@ class Queens:
 
             self.criterioDeParada = True;
 
-
 '''
 
   _ __     __ _ _   _  ___  ___ _ __  ___
@@ -435,11 +434,15 @@ L = int(sys.argv[5])
 pm = float(sys.argv[6])
 pc = float(sys.argv[7])
 
-queens = Queens(N, i, P, K, L, pm, pc)
-queens.main()
+# queens = Queens(N, i, P, K, L, pm, pc)
+# queens.main()
 
-# except:
-    # print('Wrong number of arguments')
-    # print('Try -h to view full list of arguments')
+def meta_test():
+    for i in range(2, 128)
+        N = i*2
+        queens = Queens(N, i, P, K, L, pm, pc)
+        queens.main()
+
+meta_test()
 
 

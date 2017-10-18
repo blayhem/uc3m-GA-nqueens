@@ -8,9 +8,10 @@ import functools as ft
 # https://pypi.python.org/pypi/progressbar2
 import progressbar
 import matplotlib.pyplot as plt
+import requests
 
 
-class Queens:
+class Queens_ordered:
 
     def __init__(self, N, iter, pSize, K, L, pm, pc):
 
@@ -77,11 +78,10 @@ class Queens:
                 1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.
                 Padres siempre es un número par, de tamaño L*2, donde L es el número de hijos.
                 '''
-                padres = [self.seleccion(poblacion, i%2==0) for i in range(0,2*self.L)]
+                padres = [self.seleccion(poblacion, i%2==0, True) for i in range(0,2*self.L)]
                 '''
-                2. Hacemos cruce con reemplazo, los padres vuelven a la poblacion
-                porque K=4 pero L=2 (perdemos 2 individuos).
-                self.cruce nos devuelve 4 individuos, 2 padres y 2 hijos.
+                2. Hacemos cruce con reemplazo L o L*2. Obtenemos L hijos o L*2 (según cruce)
+                self.cruce nos devuelve los hijos, L para SCX y L*2 para OC1.
                 '''
                 # nuevaPoblacion = self.cruce_SCX(padres);
                 nuevaPoblacion = self.cruce_OC1(padres);
@@ -181,10 +181,10 @@ class Queens:
         self.fitnesses[key] = fitness
         return fitness;
 
-    def seleccion(self, poblacion, reemplazo):
+    def seleccion(self, poblacion, reemplazo, reverse):
         K = self.K;
         L = self.L;
-        return self.torneo2(poblacion, K, reemplazo);
+        return self.torneo2(poblacion, K, reemplazo, reverse);
 
     def torneo(self, poblacion, K, L):
         muestra = []
@@ -200,10 +200,10 @@ class Queens:
             muestra.append(poblacion.pop(sel));
             # taken.append(sel);
 
-        muestra.sort(key=self.getFitness, reverse=reverse)
+        muestra.sort(key=self.getFitness, reverse=True)
         return muestra[0:L]
 
-    def torneo2(self, poblacion, K, reemplazo):
+    def torneo2(self, poblacion, K, reemplazo, reverse):
         muestra = []
         taken = []
         luck = 0.75;
@@ -216,7 +216,7 @@ class Queens:
             taken.append(sel);
 
         # muestra de tamaño K, ordenada de mayor a menor fitness
-        muestra.sort(key=self.getFitness, reverse=True)
+        muestra.sort(key=self.getFitness, reverse=reverse)
 
         if(r.uniform(0, 1) < luck):
             return muestra[0]
@@ -327,7 +327,7 @@ class Queens:
             p1 = padres[i*2]
             p2 = padres[(i*2)+1]
             size = len(p1)
-            if(size != len(p2) or size != N):
+            if(size != len(p2) or size != self.N):
                 raise ValueError('La longitud de los padres difiere.')
 
             cut1 = r.randrange(0,size/2)
@@ -397,6 +397,144 @@ class Queens:
 
             self.criterioDeParada = True;
 
+
+class Queens_binary(Queens_ordered):
+
+    def __init__(self, N, iter, pSize, K, L, pm, pc):
+
+        if(N<4):
+            print('''
+                El problema no tiene solución para n=2 o n=3.
+                > E. J. Hoffman et al., "Construction for the Solutions of the m Queens Problem". Mathematics Magazine, Vol. XX (1969), pp. 66–72.
+                http://penguin.ewu.edu/~trolfe/QueenLasVegas/Hoffman.pdf
+                ''')
+            exit()
+
+        elif(K>pSize):
+            print('El tamaño de muestra de torneo (', K,')tiene que ser menor que el tamaño de población (', pSize, ')')
+            exit()
+
+        # Parámetros básicos
+        self.N = N;
+        self.iter = i;
+        
+        self.K = K;
+        self.L = L;
+        self.pm = pm;
+        self.pc = pc;
+        
+        # Parámetros internos
+        self.fitnesses = {};   # cache de evaluaciones
+        self.evaluaciones = 0; # num de evaluaciones
+        self.ciclos = 0;       # num de ciclos de evaluación
+        self.criterioDeParada = False;
+        self.solutions = [];
+
+        # diversity index
+        self.bestValue = 9999;
+        self.diversityIndex = 1
+
+        # INIT
+        poblacion = [];
+        for p in range(0, pSize):
+            individuo = [r.randrange(0,2) for i in range(0,N*N)]
+            poblacion.append(individuo);
+
+        self.poblacion = poblacion;
+
+    def main(self):
+        bar = progressbar.ProgressBar(redirect_stdout=False)
+        poblacion = self.poblacion;
+        # backup = []
+        while ( self.ciclos < self.iter):
+            try:
+                # bar.update((self.ciclos*100)/self.iter)
+                # selección
+                padres = [Queens_ordered.seleccion(self, poblacion, i%2==0, False) for i in range(0,2*self.L)]
+                # cruce + reemplazo
+                nuevaPoblacion = self.cruce_SP(padres);
+                poblacion = poblacion[self.L*2:]
+                # mutación
+                nuevaPoblacion = list(map(lambda ind: Queens_ordered.mutacion(self, ind), nuevaPoblacion));
+                poblacion += nuevaPoblacion;
+                self.ciclos += 1;
+
+                for individuo in poblacion:
+                    Queens_ordered.check_exit(self, individuo)
+
+                bestValue = min(self.fitnesses.values())
+                print('Best individual fitness: ', bestValue, 'worst individual fitness: ', max(self.fitnesses.values()), 'diversityIndex: ', int(self.diversityIndex))
+                if(bestValue == self.bestValue):
+                    self.diversityIndex += 0.01
+                    if(self.diversityIndex>10):
+                        self.diversityIndex = 1;
+
+                else:
+                    self.diversityIndex = 1;
+                    self.bestValue = bestValue;
+                
+                if(self.criterioDeParada):
+                    break;
+
+                if(bestValue==1):
+                    # forzamos
+                    for individuo in poblacion:
+                        Queens_ordered.check_exit(self, individuo)
+
+            except KeyboardInterrupt:
+                print('RTL+C. Parando.')
+                break
+
+        if(len(self.solutions) == 0):
+            print('\nNo solution found. ', self.evaluaciones, 'evaluaciones', 'máximo fitness: ', self.bestValue, 'en ', self.ciclos, 'iteraciones')
+        else:
+            print(len(self.solutions), 'soluciones encontradas')
+
+    def getFitness(self, individuo):
+        key = ''.join(str(n) for n in individuo)
+        try:
+            fitness = self.fitnesses[key];
+            # print('CACHED!')
+            return fitness;
+        except:
+            cadena = ft.reduce(lambda s,c: s+str(c), individuo, '')
+            self.evaluaciones += 1;
+            try:
+                r = requests.get('http://memento.evannai.inf.uc3m.es/age/test?c='+cadena)
+                fitness = float(r.text)
+                self.fitnesses[key] = fitness
+            except:
+                fitness = 9999
+            return fitness;
+
+    def cruce_SP(self, padres):
+        offspring = []
+
+        for i in range(0, int(len(padres)/2)):
+            # para cada par de padres:
+            p1 = padres[i*2]
+            p2 = padres[(i*2)+1]
+            size = len(p1)
+            if(size != len(p2) or size != self.N*self.N):
+                raise ValueError('La longitud de los padres difiere.')
+
+            cut = r.randrange(0,size)
+
+            hijo1 = p1[:cut] + p2[cut:]
+            offspring.append(hijo1)
+
+            hijo2 = p2[:cut] + p1[cut:]
+            offspring.append(hijo2)
+
+        return offspring
+
+class Queens_bruteforce:
+    print('jaja si')
+
+
+
+
+
 '''
 
   _ __     __ _ _   _  ___  ___ _ __  ___
@@ -434,15 +572,13 @@ L = int(sys.argv[5])
 pm = float(sys.argv[6])
 pc = float(sys.argv[7])
 
-# queens = Queens(N, i, P, K, L, pm, pc)
-# queens.main()
 
 def meta_test():
-    for i in range(2, 128)
+    for i in range(2, 128):
         N = i*2
-        queens = Queens(N, i, P, K, L, pm, pc)
+        queens = Queens_ordered(N, i, P, K, L, pm, pc)
         queens.main()
 
-meta_test()
-
-
+# meta_test()
+queens = Queens_binary(N, i, P, K, L, pm, pc)
+queens.main()

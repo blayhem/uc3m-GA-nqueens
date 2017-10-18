@@ -350,8 +350,9 @@ class Queens_ordered:
         p = self.diversityIndex*self.pm #*self.N;     # probabilidad de mutación
         size = len(individuo)
 
-        if(r.uniform(0, 1) < p):
-            for i in range(0, size):
+        # swap 1 individuo solo
+        for i in range(0, size):
+            if(r.uniform(0, 1) < p):
                 j = r.randrange(0, size);
                 prev = individuo[i]
                 individuo[i] = individuo[j]
@@ -528,8 +529,63 @@ class Queens_binary(Queens_ordered):
 
         return offspring
 
-class Queens_bruteforce:
-    print('jaja si')
+class Queens_bruteforce(Queens_ordered):
+
+    def __init__(self, N):
+        # N reinas, coord
+        self.reinas = []
+        self.N = N
+
+        ciclos = 0;
+        while (len(reinas) != N):
+            ciclos += 1;
+            print(reinas);
+            self.populate(reinas)
+
+        print('''
+            PARA N = {}
+            SOLUTION FOUND: {}
+            {} evaluaciones,
+            {} ciclos
+            '''.format(N, ciclos))
+
+        # BOARD
+        board = [(y, x) for (y, x) in enumerate(reinas)]
+        Queens_ordered.print_board(self, board);
+
+    def populate(self, reinas):
+        if(len(reinas) == 0):
+            reinas.append(r.randrange(0,self.N))
+        else:
+            # coordenadas de la nueva reina
+            x, y = self.position(reinas)
+            while x=='Error':
+                notavailable.append(reinas.pop());
+                x, y = position(reinas)
+            reinas.append([x, y])
+
+    def position(self, reinas):
+        x, y = (0, 0)
+        while(not validate(reinas, x, y)):
+            if(y >= size-1):
+                return ("Error", "Error")
+            if(x >= size-1):
+                y+=1
+                x = 0
+            else:
+                x+=1
+        return (x, y)
+
+    def validate(reinas, x, y):
+        for r in reinas:
+            if(r[0]==x or r[1]==y or r[0]-r[1] == x-y or r[1]+r[0] == y+x):
+                return False;
+        for n in notavailable:
+            if(n[0]==x and n[1]==y):
+                return False;
+        return True
+
+
 
 
 
@@ -580,5 +636,5 @@ def meta_test():
         queens.main()
 
 # meta_test()
-queens = Queens_binary(N, i, P, K, L, pm, pc)
+queens = Queens_ordered(N, i, P, K, L, pm, pc)
 queens.main()

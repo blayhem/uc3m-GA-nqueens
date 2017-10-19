@@ -67,12 +67,12 @@ class Queens_ordered:
         # print(min(list(map(lambda i: self.getFitness(i), poblacion))))
 
     def main(self):
-        bar = progressbar.ProgressBar(redirect_stdout=False)
+        # bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
         # backup = []
         while ( self.ciclos < self.iter):
             try:
-                bar.update((self.ciclos*100)/self.iter)
+                # bar.update((self.ciclos*100)/self.iter)
 
                 '''
                 1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.

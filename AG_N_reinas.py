@@ -71,7 +71,7 @@ class Queens_ordered:
         # print(min(list(map(lambda i: self.getFitness(i), poblacion))))
 
     def main(self):
-        bar = progressbar.ProgressBar(redirect_stdout=False)
+        # bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
         # backup = []
         while ( self.ciclos < self.iter):

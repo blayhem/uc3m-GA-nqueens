@@ -9,6 +9,10 @@ import functools as ft
 import progressbar
 import matplotlib.pyplot as plt
 import requests
+import multiprocessing
+import concurrent.futures
+
+import time
 
 
 class Queens_ordered:
@@ -72,18 +76,27 @@ class Queens_ordered:
         # backup = []
         while ( self.ciclos < self.iter):
             try:
-                bar.update((self.ciclos*100)/self.iter)
+                # bar.update((self.ciclos*100)/self.iter)
 
                 '''
                 1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.
                 Padres siempre es un número par, de tamaño L*2, donde L es el número de hijos.
                 '''
-                padres = [self.seleccion(poblacion, i%2==0, True) for i in range(0,2*self.L)]
+                t1 = time.time()
+                padres = []
+                with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+                    # print(future.result())
+                    sel = [executor.submit(self.seleccion, poblacion, i%2==0, True) for i in range(0,2*self.L)]
+                    for future in concurrent.futures.as_completed(sel):
+                        padres.append(future.result())
+
                 '''
                 2. Hacemos cruce con reemplazo L o L*2. Obtenemos L hijos o L*2 (según cruce)
                 self.cruce nos devuelve los hijos, L para SCX y L*2 para OC1.
                 '''
                 # nuevaPoblacion = self.cruce_SCX(padres);
+                t2 = time.time()
+                print('Tiempo de selección: ', (t2 - t1)*1000)
                 nuevaPoblacion = self.cruce_OC1(padres);
                 # REEMPLAZO:
                 # poblacion = poblacion[self.L:]
@@ -92,6 +105,8 @@ class Queens_ordered:
                 3. Mutamos la nueva poblacion.
                 Politica opcional: if son has clone in poblacion, do not add.
                 '''
+                t3 = time.time()
+                print('Tiempo de cruce y reemplazo: ', (t3 - t2)*1000)
                 nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), nuevaPoblacion));
                 # nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), padres));
                 poblacion += nuevaPoblacion;
@@ -100,8 +115,15 @@ class Queens_ordered:
                 4. Calculamos fitness de la poblacion para revisar el criterio
                 de parada
                 '''
-                for individuo in poblacion:
-                    self.check_exit(individuo)
+                t4 = time.time()
+                print('Tiempo de mutación: ', (t4 - t3)*1000)
+                
+                with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+                    for individuo in poblacion:
+                        executor.submit(self.check_exit, individuo)
+
+                t5 = time.time()
+                print('Tiempo de evaluación: ', (t5 - t4)*1000, ' (', len(poblacion),') individuos')
 
                 # GRAPHICS - mejor fitness de toda la población
                 bestValue = max(self.fitnesses.values())
@@ -123,6 +145,11 @@ class Queens_ordered:
                 
                 if(self.criterioDeParada):
                     break;
+
+
+                t6 = time.time()
+                print('Tiempo criterio de parada: ', (t6 - t5)*1000, '\n')
+                if(self.ciclos>8): break;
 
                 if(bestValue==1):
                     for individuo in poblacion:
@@ -164,10 +191,10 @@ class Queens_ordered:
                     r_x = individuo[r_y]
                     if(r_y == ind_y):
                         continue; # mismo individuo
-                    elif(r_x==ind_x
-                      or r_y==ind_y
-                      or r_x-r_y == ind_x-ind_y
-                      or r_x+r_y == ind_x+ind_y):
+                    elif(# r_x==ind_x or
+                      # r_y==ind_y or
+                      r_x-r_y == ind_x-ind_y or
+                      r_x+r_y == ind_x+ind_y):
                         bad  += 1;
                         
                 index = evaluable.index(ind_x)

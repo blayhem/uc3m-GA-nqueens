@@ -6,8 +6,8 @@ import sys
 import math
 import functools as ft
 # https://pypi.python.org/pypi/progressbar2
-import progressbar
-import matplotlib.pyplot as plt
+# import progressbar
+# import matplotlib.pyplot as plt
 import requests
 import multiprocessing
 import concurrent.futures
@@ -96,7 +96,7 @@ class Queens_ordered:
                 '''
                 # nuevaPoblacion = self.cruce_SCX(padres);
                 t2 = time.time()
-                print('Tiempo de selección: ', (t2 - t1)*1000)
+                # print('Tiempo de selección: ', (t2 - t1)*1000)
                 nuevaPoblacion = self.cruce_OC1(padres);
                 # REEMPLAZO:
                 # poblacion = poblacion[self.L:]
@@ -106,7 +106,7 @@ class Queens_ordered:
                 Politica opcional: if son has clone in poblacion, do not add.
                 '''
                 t3 = time.time()
-                print('Tiempo de cruce y reemplazo: ', (t3 - t2)*1000)
+                # print('Tiempo de cruce y reemplazo: ', (t3 - t2)*1000)
                 nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), nuevaPoblacion));
                 # nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), padres));
                 poblacion += nuevaPoblacion;
@@ -116,18 +116,21 @@ class Queens_ordered:
                 de parada
                 '''
                 t4 = time.time()
-                print('Tiempo de mutación: ', (t4 - t3)*1000)
+                # print('Tiempo de mutación: ', (t4 - t3)*1000)
                 
-                with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
-                    for individuo in poblacion:
-                        executor.submit(self.check_exit, individuo)
+                # with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+                # with multiprocessing.Pool(multiprocessing.cpu_count()) as p:
+                for individuo in poblacion:
+                    self.check_exit(individuo)
+                        # executor.submit(self.check_exit, individuo)
+                        # p.map(self.check_exit, [individuo])
 
                 t5 = time.time()
-                print('Tiempo de evaluación: ', (t5 - t4)*1000, ' (', len(poblacion),') individuos')
+                # print('Tiempo de evaluación: ', (t5 - t4)*1000)
 
                 # GRAPHICS - mejor fitness de toda la población
                 bestValue = max(self.fitnesses.values())
-                # print('Best individual fitness: ', bestValue, 'worst individual fitness: ', min(self.fitnesses.values()), 'diversityIndex: ', int(self.diversityIndex))
+                print('Best individual fitness: ', bestValue, 'worst individual fitness: ', min(self.fitnesses.values()), 'diversityIndex: ', int(self.diversityIndex))
                 if(bestValue == self.bestValue):
                     self.diversityIndex += 0.01
                     if(self.diversityIndex>10):
@@ -148,8 +151,8 @@ class Queens_ordered:
 
 
                 t6 = time.time()
-                print('Tiempo criterio de parada: ', (t6 - t5)*1000, '\n')
-                if(self.ciclos>8): break;
+                # print('Tiempo criterio de parada: ', (t6 - t5)*1000, '\n')
+                # if(self.ciclos>8): break;
 
                 if(bestValue==1):
                     for individuo in poblacion:
@@ -165,12 +168,14 @@ class Queens_ordered:
         else:
             print(len(self.solutions), 'soluciones encontradas')
 
+        '''
         plt.plot(self.fvalues)
         title = 'N={}, K={}, L={}, p. de mutación={}, p. de cruce={}'.format(self.N, self.K, self.L, self.pm, self.pc)
         plt.title(title)
         plt.ylabel('fitness')
         plt.xlabel('iteraciones')
         plt.show()
+        '''
 
     def getFitness(self, individuo):
         # self.print_board([(y, x) for (y, x) in enumerate(individuo)]);
@@ -378,12 +383,13 @@ class Queens_ordered:
         size = len(individuo)
 
         # swap 1 individuo solo
-        for i in range(0, size):
-            if(r.uniform(0, 1) < p):
-                j = r.randrange(0, size);
-                prev = individuo[i]
-                individuo[i] = individuo[j]
-                individuo[j] = prev;
+        # for i in range(0, size):
+        if(r.uniform(0, 1) < p):
+            i = r.randrange(0, size);
+            j = r.randrange(0, size);
+            prev = individuo[i]
+            individuo[i] = individuo[j]
+            individuo[j] = prev;
 
         return individuo;
 

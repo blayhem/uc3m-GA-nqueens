@@ -148,45 +148,56 @@ Se plantean dos funciones de fitness para el problema a tratar:
     \item Considerando que, debido a nuestra codificación, no existe la posibilidad de que $n$ sea distinta de $N$ (siempre hay $N$ reinas sobre el tablero, aunque estén mal situadas), se propone la función $F=1-\frac{b}{N}$, que no es más que una substitución de $n=N$ en la función propuesta anteriormente. Esta es la función implementada.
 \end{enumerate}
 
+Nuestro algoritmo incorpora también un caché de fitness por individuo, con el objetivo de evitar evaluaciones sobre individuos idénticos. De esta forma, los accesos a caché no se cuentan como evaluaciones, sólo cuando es necesario calcular el fitness del individuo dado.
+
 \subsection{Métodos implementados}
 
 \subsubsection{Selección}
 
 El método de selección aplicado para nuestro problema es una selección por torneo.
 
-Para esta selección tomamos un parámetro $K$ que se corresponde con el tamaño de la muestra de población que tomamos para nuestro torneo. A continuación, evaluamos la muestra y seleccionamos al mejor individuo un número de veces definido por el parámetro $L$.
+Para esta selección tomamos un parámetro $K$ que se corresponde con el tamaño de la muestra de población que tomamos para nuestro torneo. A continuación, evaluamos la muestra y seleccionamos al mejor individuo un número de veces definido por el parámetro $L$ (el número de hijos que queremos conseguir a partir de $L*2$ padres).
 
 Originalmente, se implementa el método de selección sugerido en el libro \emph{An Introduction to Genetic Algorithms} (Melanie, M. 1996), en el cual la selección por torneo ordenaba la muestra de tamaño $K$ por su grado de fitness, y seleccionaba los dos mejores como padres de la nueva población. Por razones de simplificación, se decide que el corte se realiza en $L$, quedando por defecto un tamaño de muestra $K$ y un tamaño de ganadores del torneo de $L$.
 
 Sin embargo, se llegó a la conclusión de que era mejor repetir el proceso de torneo $L$ veces hasta conseguir el número deseado de padres.
 
-...desarrollar
-
-[GRÁFICOS para demostrarlo]
-
-El método de selección escogido va acompañado de la política de reemplazo.
+El método de selección escogido va acompañado de la política de reemplazo correspondiente (siempre renovando una parte significativa de la población, igual al número de hijos que introducimos en ésta). El tamaño de la población siempre se mantiene constante.
 
 \subsubsection{Cruce}
 
 El cruce que se implementa es una recombinación discreta entre los dos padres con cuidado de no repetir ninguno de los anteriores valores de $N$ 
 
-Se genera un descendiente eligiendo un gen de cada progenitor de forma aleatoria
+En el código se implementan tres métodos de cruce:
 
-\textbf Métodos de cruce:
+\begin{itemize}
+    \item \textbf{Cruce secuencial constructivo aleatorio}: vamos construyendo el hijo progresivamente (de longitud $0$ a $N$, donde el valor $i$-ésimo del hijo corresponderá con el bit $i$ de uno de los padres, escogido al azar.
+    \item \textbf{Cruce secuencial constructivo (SCX)}: parecido al método anterior, este método va construyendo progresivamente el hijo con una pseudo-evaluación a modo de heurística. Para cada par de bits ($p1, p2$) se evalúa su coste (fitness del individuo $F'(I)=F(I)+p$) de ser añadido al hijo, y se coge el bit que mejora el fitness del individuo.
 
-\begin{enumerate}
-    \item Partially matched crossover (PMX): In this method, two crossover points are selected at random and PMX proceeds by position wise exchanges. The two crossover points give matching selection. It affects cross by position-by-position exchange operations. In this method parents are mapped to each other, hence we can also call it partially mapped crossover.
-    \item Cycle crossover (CX): Beginning at any gene $i$ in parent 1, the $i$-th gene in parent 2 becomes replaced by it. The same is repeated for the displaced gene until the gene which is equal to the first inserted gene becomes replaced (cycle).
-    \item Order crossover operator (OX1): A portion of one parent is mapped to a portion of the other parent. From the replaced portion on, the rest is filled up by the remaining genes, where already present genes are omitted and the order is preserved.
-    \item Otros: 
-    \begin{enumerate}
-        \item order-based crossover operator (OX2)
-        \item position-based crossover operator (POS)
-        \item voting recombination crossover operator (VR)
-        \item alternating-position crossover operator (AP)
-        \item sequential constructive crossover operator (SCX)
-    \end{enumerate}
-\end{enumerate}
+    Ejemplo: 
+    
+    $p1=[4,3,1,2]$, $p2=[1,2,3,4]$
+    
+    $h =[1]$ (inicializado al azar) $\rightarrow$ se evalúa $h_1=[1,3]$ y $h_2=[1,2]$. 
+    
+    Si se considera que $h_1=[1,3]$ tiene mejor fitness que $h_2=[1,2]$, $h=[1,3]$, y así N veces hasta completar el hijo.
+
+    \item \textbf{Cruce ordenado 1 (OC1)}: sean dos padres $p1$ y $p2$, uno de ellos se considera cadena de \emph{corte} y otro cadena de \emph{llenado}. Se selecciona una sub-cadena del primer padre y se inserta en el hijo respetando la posición original. Se llenan los huecos laterales con los valores del otro padre que no están ya en la sub-cadena seleccionada del primero (para no repetir valores).
+
+    Ejemplo:
+    $p1=[A,B,C,D,E,F,G,H,I]$, $p2=[a,b,c,d,e,f,g,h,i]$
+    
+    Sección de corte: $\_ \_ CDEF \_ \_ \_$. Valores de llenado: $h,a,i,b,g$
+    
+    $h=[h, a, C, D, E, F, i, b, g]$
+    
+    \textbf{Posibles alternativas}
+    
+    \subitem Cambiando el orden de inserción del bloque de llenado: $h_2=[b, g, C, D, E, F, h, a, i]$
+    
+    \subitem Inviertiendo la selección \emph{corte}-\emph{llenado}: $h_3=[H, A, c, d, e, f, I, B, G]$
+    
+\end{itemize}
 
 
 \subsubsection{Mutación}
@@ -195,15 +206,17 @@ Se genera un descendiente eligiendo un gen de cada progenitor de forma aleatoria
     \item Primera aproximación: se mutan los dos hijos con probabilidad $p_m$. Aproximación clásica: por cada bit del individuo, se evalúa su probabilidad de mutación, y se cambia el bit (0-1). Al no ser codificación binaria, lo cambiamos por valores 0-N.
     \item Segunda aproximación: con (1) obtenemos resultados repetidos, nuestra codificación es una permutación de columnas (valores 0-N). Por lo tanto, evaluamos la probabilidad del individuo entero de mutar, y si es positiva hacemos un reordenamiento de sus valores (shuffle).
     \item Tercera aproximación: con (2) obtenemos valores demasiado aleatorios con una probabilidad de mutación elevada. Nuestra aproximación esta vez consiste de nuevo en evaluar la probabilidad de mutación bit a bit, y en caso de ser positiva, intercambiando dicho bit con otro bit del individuo de manera aleatoria. De esta forma, en caso de mutar 1 bit, el individuo sólo diferirá del original en 2 bits.
-    \item Cuarta aproximación: con (3) se estanca mucho. Queremos mutar el individuo más, introducimos un índice de diversidad. Este índice multiplica la probabilidad de mutación hasta por 10, momento en el cual se resetea. Cambiamos también el planteamiento de (3), ahora muta todo el individuo con probabilidad pm, no bit a bit.
+    \item Cuarta aproximación: con (3) se estanca mucho. Queremos mutar el individuo más, introducimos un índice de diversidad. Este índice multiplica la probabilidad de mutación hasta 1, momento en el cual se resetea de nuevo (para evitar demasiada aleatoriedad). Cambiamos también el planteamiento de (3), ahora considera la probabilidad pm para todo el individuo, y en caso positivo hace un solo cambio de un par de bits (swap).
     
 \end{enumerate}
 \textbf{Nota:}
 la probabilidad de mutar depende de N, ya que el número de bits a mutar depende también del tamaño del individuo, así que para hacerlo más constante tomamos la probabilidad de 1/N y la multiplicamos por la probabilidad por individuo.
 
 
-- Cruce:
+\subsubsection{Evaluación de la población: posibles soluciones}
+En primer lugar, recorremos toda la población evaluando el fitness de cada individuo. En caso de encontrar un individuo con fitness perfecto ($1$), es decir, una solución, se imprime por pantalla la solución, el número de evaluaciones hasta ese momento, así como el número de ciclos.
 
+En caso de no encontrar solución, revisamos igualmente el fitness del mejor individuo de la población para ver si ha mejorado de una generación a otra. En caso contrario, modificamos el índice de diversidad descrito anteriormente.
 
 \subsection{Parametrización}
 

@@ -13,6 +13,7 @@ import multiprocessing
 import concurrent.futures
 
 import time
+import csv
 
 
 class Queens_ordered:
@@ -130,7 +131,7 @@ class Queens_ordered:
 
                 # GRAPHICS - mejor fitness de toda la población
                 bestValue = max(self.fitnesses.values())
-                print('Best individual fitness: ', bestValue, 'worst individual fitness: ', min(self.fitnesses.values()), 'diversityIndex: ', int(self.diversityIndex))
+                # print('Best individual fitness: ', bestValue, 'worst individual fitness: ', min(self.fitnesses.values()), 'diversityIndex: ', int(self.diversityIndex))
                 if(bestValue == self.bestValue):
                     self.diversityIndex += 0.01
                     if(self.diversityIndex>10):
@@ -166,7 +167,9 @@ class Queens_ordered:
         if(len(self.solutions) == 0):
             print('\nNo solution found. ', self.evaluaciones, 'evaluaciones', 'máximo fitness: ', self.bestValue, 'en ', self.ciclos, 'iteraciones')
         else:
-            print(len(self.solutions), 'soluciones encontradas')
+            print(len(self.solutions), 'soluciones encontradas para N=', self.N)
+
+        return (self.evaluaciones, self.ciclos)
 
         '''
         plt.plot(self.fvalues)
@@ -362,8 +365,8 @@ class Queens_ordered:
             if(size != len(p2) or size != self.N):
                 raise ValueError('La longitud de los padres difiere.')
 
-            cut1 = r.randrange(0,size/2)
-            cut2 = r.randrange(0,size/2)
+            cut1 = r.randrange(0,int(size/2))
+            cut2 = r.randrange(0,int(size/2))
 
             cSection = p1[cut1:cut1+int(size/2)]
             other    = list(filter(lambda n: n not in cSection, p2))
@@ -418,17 +421,18 @@ class Queens_ordered:
             self.solutions.append(individuo);
 
             # STATS
-            print('''
+            '''
+            print(
                 PARA N = {}
                 SOLUTION FOUND: {}
                 {} evaluaciones,
                 {} ciclos
-                '''.format(self.N, individuo, self.evaluaciones, self.ciclos))
+                .format(self.N, individuo, self.evaluaciones, self.ciclos))
 
             # BOARD
             board = [(y, x) for (y, x) in enumerate(individuo)]
             self.print_board(board);
-
+            '''
             self.criterioDeParada = True;
 
 
@@ -652,7 +656,7 @@ pc: probabilidad de cruce
 python3 AG_N_reinas.py 8 20000 100 20 10 0.1 0.9
 '''
 
-N = int(sys.argv[1])
+def_N = int(sys.argv[1])
 i = int(sys.argv[2])
 P = int(sys.argv[3])
 K = int(sys.argv[4])
@@ -668,6 +672,30 @@ def meta_test():
         queens = Queens_ordered(N, i, P, K, L, pm, pc)
         queens.main()
 
+def ods_writer():
+    with open('detail.csv', 'w', newline='') as detail, open('mini.csv', 'w', newline='') as mini:
+        detailWriter = csv.writer(detail)
+        miniWriter  = csv.writer(mini)
+
+        for i in range(4,12):
+            N = i
+            evaluaciones_sum = [];
+            ciclos_sum = []
+
+            for j in range(0,10):
+                queens = Queens_ordered(N, i, P, K, L, pm, pc)
+                (evaluaciones, ciclos) = queens.main()
+                evaluaciones_sum.append(evaluaciones)
+                ciclos_sum.append(ciclos)
+                row = [N, evaluaciones, ciclos]
+                detailWriter.writerow(row)
+
+            meaneval = ft.reduce(lambda a,b: a+b, evaluaciones_sum)/10
+            meanciclos = ft.reduce(lambda a,b: a+b, ciclos_sum)/10
+            miniWriter.writerow([N, meaneval, meanciclos])
+
+
 # meta_test()
-queens = Queens_ordered(N, i, P, K, L, pm, pc)
-queens.main()
+ods_writer()
+# queens = Queens_ordered(def_N, i, P, K, L, pm, pc)
+# queens.main()

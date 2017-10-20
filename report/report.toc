@@ -14,7 +14,8 @@
 \contentsline {subsection}{\numberline {3.3}M\IeC {\'e}todos implementados}{3}{subsection.3.3}
 \contentsline {subsubsection}{\numberline {3.3.1}Selecci\IeC {\'o}n}{3}{subsubsection.3.3.1}
 \contentsline {subsubsection}{\numberline {3.3.2}Cruce}{4}{subsubsection.3.3.2}
-\contentsline {subsubsection}{\numberline {3.3.3}Mutaci\IeC {\'o}n}{4}{subsubsection.3.3.3}
+\contentsline {subsubsection}{\numberline {3.3.3}Mutaci\IeC {\'o}n}{5}{subsubsection.3.3.3}
+\contentsline {subsubsection}{\numberline {3.3.4}Evaluaci\IeC {\'o}n de la poblaci\IeC {\'o}n: posibles soluciones}{5}{subsubsection.3.3.4}
 \contentsline {subsection}{\numberline {3.4}Parametrizaci\IeC {\'o}n}{5}{subsection.3.4}
 \contentsline {subsection}{\numberline {3.5}Resultados}{6}{subsection.3.5}
 \contentsline {section}{\numberline {4}Conclusiones, Problemas Encontrados y Opiniones Personales}{7}{section.4}

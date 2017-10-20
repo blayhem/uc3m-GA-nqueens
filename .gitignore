@@ -103,3 +103,10 @@ ENV/
 .pdf
 report/*
 !report/report.tex
+.aux
+.out
+.pdf
+.toc
+
+.DS_Store
+.csv

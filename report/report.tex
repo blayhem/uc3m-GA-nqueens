@@ -270,6 +270,7 @@ A continuación se incluyen unas gráficas de la evolución de la función de fi
 \end{figure}
 
 \newpage
+
 \subsection{Resultados}
 
 A continuación podemos ver una gráfica del número de ciclos y evaluaciones requeridas para diversos valores de $N$ con las primeras versiones del algoritmo:
@@ -277,15 +278,24 @@ A continuación podemos ver una gráfica del número de ciclos y evaluaciones re
 \begin{figure}[h]
     \center
     \begin{subfigure}{.50\textwidth}
-        \includegraphics[width=\textwidth]{cycles}
+        \includegraphics[width=\textwidth]{before}
     \end{subfigure}
+    \caption{Primera versión}
 \end{figure}
 
 Podemos ver que el número de ciclos y evaluaciones se disparan por el crecimiento del espacio de búsqueda y por el aumento en la variedad de los individuos respectivamente.
 
 Al implementar los cambios anteriormente descritos, vemos los siguientes resultados:
 
-% TODO: gráficos de resultados de los últimos parametros (script+ods)
+\begin{figure}[h]
+    \center
+    \begin{subfigure}{.50\textwidth}
+        \includegraphics[width=\textwidth]{after}
+    \end{subfigure}
+    \caption{Versión final}
+\end{figure}
+
+En la versión final podemos ver que el número de evaluaciones tiene un crecimiento más suave, casi lineal a partir de $N=10$, y el número de ciclos se reduce significativamente.
 
 \newpage
 
@@ -299,10 +309,5 @@ De menor a mayor estancamiento en cruce:
 - cruce SCX no ordenado
 - cruce SCX
 
-\section{Anexo}
-
-
-
-\newcounter{atm}
 
 \end{document}

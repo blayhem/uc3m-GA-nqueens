@@ -7,7 +7,7 @@ import math
 import functools as ft
 # https://pypi.python.org/pypi/progressbar2
 # import progressbar
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import requests
 import multiprocessing
 import concurrent.futures
@@ -526,11 +526,10 @@ class Queens_binary(Queens_ordered):
         else:
             print(len(self.solutions), 'soluciones encontradas')
 
-    def getFitness(self, individuo):
+    def getFitnessWithURL(self, individuo):
         key = ''.join(str(n) for n in individuo)
         try:
             fitness = self.fitnesses[key];
-            # print('CACHED!')
             return fitness;
         except:
             cadena = ft.reduce(lambda s,c: s+str(c), individuo, '')
@@ -542,6 +541,38 @@ class Queens_binary(Queens_ordered):
             except:
                 fitness = 9999
             return fitness;
+
+    def getFitness(self, individuo):
+        key = ''.join(str(n) for n in individuo)
+        try:
+            fitness = self.fitnesses[key];
+            return fitness;
+        except:
+            # print('Calculating fitness...')
+            evaluable = individuo[:]
+            self.evaluaciones += 1;
+            bad = 0;
+            for (ind_y, ind_x) in enumerate(individuo): # posiciones de reinas
+                for(r_y) in range(ind_y+1, len(individuo)):
+                    r_x = individuo[r_y]
+                    if(r_y == ind_y):
+                        continue; # mismo individuo
+                    elif(r_x==ind_x or
+                      r_y==ind_y or
+                      r_x-r_y == ind_x-ind_y or
+                      r_x+r_y == ind_x+ind_y):
+                        bad  += 1;
+
+                index = evaluable.index(ind_x)
+                evaluable.pop(index); # quitamos 1 reina adyacente para tener solo 1 arista
+
+        # return (n/N - bad/n)
+        if(bad == 0):
+            fitness = 1;
+        else:
+            fitness = (1 - bad/self.N)
+        self.fitnesses[key] = fitness
+        return fitness;
 
     def cruce_SP(self, padres):
         offspring = []

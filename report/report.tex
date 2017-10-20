@@ -144,7 +144,7 @@ Esto nos elimina automáticamente muchas soluciones inválidas de la población,
 
 En los motivos anteriormente propuestos (número de estados y restricciones incorporadas) se plantea que la codificación binaria es peor para nuestro problema. A continuación, evaluamos dicha codificación con funciones canónicas (selección por torneo, cruce simple, mutación de bit-flipping sujeta a probabilidad...) para demostrarlo.
 
-
+% TODO: graficas de evaluaciones/ciclos para Ns en binary, pyplot
 
 \subsection{Función de fitness.}
 
@@ -279,7 +279,7 @@ A continuación se incluyen unas gráficas de la evolución de la función de fi
 
 \subsection{Resultados}
 
-A continuación podemos ver una gráfica del número de ciclos y evaluaciones requeridas para diversos valores de $N$ con las primeras versiones del algoritmo:
+A continuación podemos ver una gráfica del número de ciclos y evaluaciones requeridas para hallar una primera solución para diversos valores de $N$ con las primeras versiones del algoritmo. Para cada valor de $N$ se ha ejecutado el código 10 veces con los mismos parámetros para trabajar con valores medios.
 
 \begin{figure}[h]
     \center
@@ -301,9 +301,15 @@ Al implementar los cambios anteriormente descritos, vemos los siguientes resulta
     \caption{Versión final}
 \end{figure}
 
-En la versión final podemos ver que el número de evaluaciones tiene un crecimiento más suave, casi lineal a partir de $N=10$, y el número de ciclos se reduce significativamente.
+En la versión final podemos ver que el número de evaluaciones tiene un crecimiento más suave (casi lineal a partir de $N=10$), y el número de ciclos se reduce significativamente.
 
 \newpage
+
+\section{Ampliación}
+
+\subsection{Todas las soluciones}
+
+Probar con los tres métodos.
 
 \section{Conclusiones, Problemas Encontrados y Opiniones Personales}
 

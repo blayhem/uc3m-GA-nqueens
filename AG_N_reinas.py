@@ -681,7 +681,7 @@ def ods_writer():
             ciclos_sum = []
 
             for j in range(0,10):
-                queens = Queens_ordered(N, i, P, K, L, pm, pc)
+                queens = Queens_binary(N, i, P, K, L, pm, pc)
                 (evaluaciones, ciclos) = queens.main()
                 evaluaciones_sum.append(evaluaciones)
                 ciclos_sum.append(ciclos)
@@ -693,7 +693,7 @@ def ods_writer():
             miniWriter.writerow([N, meaneval, meanciclos])
 
 
-meta_test()
-# ods_writer()
+#meta_test()
+ods_writer()
 # queens = Queens_ordered(def_N, i, P, K, L, pm, pc)
 # queens.main()

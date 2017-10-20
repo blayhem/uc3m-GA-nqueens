@@ -140,6 +140,12 @@ Además, esta codificación lleva implícitas las restricciones de fila y column
 
 Esto nos elimina automáticamente muchas soluciones inválidas de la población, agilizando el algoritmo y permitiendo encontrar una solución mucho más rápidamente.
 
+\subsubsection{Pruebas sobre la codificación binaria}
+
+En los motivos anteriormente propuestos (número de estados y restricciones incorporadas) se plantea que la codificación binaria es peor para nuestro problema. A continuación, evaluamos dicha codificación con funciones canónicas (selección por torneo, cruce simple, mutación de bit-flipping sujeta a probabilidad...) para demostrarlo.
+
+
+
 \subsection{Función de fitness.}
 
 Se plantean dos funciones de fitness para el problema a tratar:
@@ -308,6 +314,8 @@ De menor a mayor estancamiento en cruce:
 - cruce SCX aleatorio
 - cruce SCX no ordenado
 - cruce SCX
+
+lentitud de código. Solución propuesta: paralelizar. Resultados? no.
 
 
 \end{document}

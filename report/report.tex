@@ -256,7 +256,18 @@ A continuación se incluyen unas gráficas de la evolución de la función de fi
     \label{}
 \end{figure}
 
-% TODO: gráficos de fitness de los últimos parametros (pyplot)
+\newcounter{own}
+\begin{figure}[h]
+    \center
+    \forloop{own}{1}{\value{own} < 8}{
+        \begin{subfigure}{.22\textwidth}
+            \includegraphics[width=\textwidth]{params_fitness/own/Figure_\arabic{own}}
+            \label{}
+        \end{subfigure}
+    }
+    \caption{Parámetros propios}
+    \label{}
+\end{figure}
 
 \newpage
 \subsection{Resultados}

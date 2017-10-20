@@ -7,7 +7,7 @@ import math
 import functools as ft
 # https://pypi.python.org/pypi/progressbar2
 # import progressbar
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import requests
 import multiprocessing
 import concurrent.futures
@@ -168,17 +168,15 @@ class Queens_ordered:
             print('\nNo solution found. ', self.evaluaciones, 'evaluaciones', 'máximo fitness: ', self.bestValue, 'en ', self.ciclos, 'iteraciones')
         else:
             print(len(self.solutions), 'soluciones encontradas para N=', self.N)
-
-        return (self.evaluaciones, self.ciclos)
-
-        '''
+        
         plt.plot(self.fvalues)
         title = 'N={}, K={}, L={}, p. de mutación={}, p. de cruce={}'.format(self.N, self.K, self.L, self.pm, self.pc)
         plt.title(title)
         plt.ylabel('fitness')
         plt.xlabel('iteraciones')
         plt.show()
-        '''
+
+        return (self.evaluaciones, self.ciclos)
 
     def getFitness(self, individuo):
         # self.print_board([(y, x) for (y, x) in enumerate(individuo)]);
@@ -667,7 +665,7 @@ pc = float(sys.argv[7])
 
 
 def meta_test():
-    for i in range(2, 128):
+    for i in range(8, 12):
         N = i*2
         queens = Queens_ordered(N, i, P, K, L, pm, pc)
         queens.main()
@@ -695,7 +693,7 @@ def ods_writer():
             miniWriter.writerow([N, meaneval, meanciclos])
 
 
-# meta_test()
-ods_writer()
+meta_test()
+# ods_writer()
 # queens = Queens_ordered(def_N, i, P, K, L, pm, pc)
 # queens.main()

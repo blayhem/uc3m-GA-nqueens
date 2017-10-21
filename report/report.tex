@@ -140,12 +140,6 @@ Además, esta codificación lleva implícitas las restricciones de fila y column
 
 Esto nos elimina automáticamente muchas soluciones inválidas de la población, agilizando el algoritmo y permitiendo encontrar una solución mucho más rápidamente.
 
-\subsubsection{Pruebas sobre la codificación binaria}
-
-En los motivos anteriormente propuestos (número de estados y restricciones incorporadas) se plantea que la codificación binaria es peor para nuestro problema. A continuación, evaluamos dicha codificación con funciones canónicas (selección por torneo, cruce simple, mutación de bit-flipping sujeta a probabilidad...) para demostrarlo.
-
-% TODO: graficas de evaluaciones/ciclos para Ns en binary, pyplot
-
 \subsection{Función de fitness.}
 
 Se plantean dos funciones de fitness para el problema a tratar:
@@ -279,7 +273,9 @@ A continuación se incluyen unas gráficas de la evolución de la función de fi
 
 \subsection{Resultados}
 
-En primer lugar podemos ver unas gráficas del número de ciclos y evaluaciones requeridas para hallar la primera solución para diversos valores de $N$ con la codificación binaria (tablero como vector binario de longitud $N*N$).
+En primer lugar podemos ver unas gráficas del número de ciclos y evaluaciones requeridas para hallar la primera solución para diversos valores de $N$ con la codificación binaria (tablero como vector binario de longitud $N*N$). Esta codificación se evalúa con funciones canónicas (selección por torneo, cruce simple, mutación de bit-flipping sujeta a probabilidad...).
+
+Para cada valor de $N$ se ha ejecutado el código 10 veces con los mismos parámetros para evaluar con valores medios.
 
 \begin{figure}[h]
     \center
@@ -289,9 +285,9 @@ En primer lugar podemos ver unas gráficas del número de ciclos y evaluaciones 
     \caption{Codificación binaria}
 \end{figure}
 
-A pesar de cachear las evaluaciones, al trabajar con individuos mucho más grandes, la variabilidad de estos y el espacio de búsqueda son mucho más grandes (no se restringen posiciones ni número de reinas).
+A pesar de cachear las evaluaciones, al trabajar con individuos mucho más grandes, la variabilidad de estos y el espacio de búsqueda son mucho mayores (no se restringen posiciones ni número de reinas).
 
-A continuación podemos ver una gráfica del número de ciclos y evaluaciones requeridas para hallar una primera solución para diversos valores de $N$ con las primeras versiones del algoritmo. Para cada valor de $N$ se ha ejecutado el código 10 veces con los mismos parámetros para trabajar con valores medios.
+A continuación podemos ver una gráfica del número de ciclos y evaluaciones requeridas para hallar una primera solución para diversos valores de $N$ con las primeras versiones del algoritmo.
 
 \begin{figure}[h]
     \center
@@ -301,7 +297,7 @@ A continuación podemos ver una gráfica del número de ciclos y evaluaciones re
     \caption{Primera versión con codificación ordenada}
 \end{figure}
 
-Podemos ver que el número de ciclos y evaluaciones se disparan por el crecimiento del espacio de búsqueda y por el aumento en la variedad de los individuos respectivamente.
+Podemos ver que el número de ciclos y evaluaciones se dispara por el crecimiento del espacio de búsqueda y por el aumento en la variedad de los individuos respectivamente.
 
 Al implementar los cambios anteriormente descritos, vemos los siguientes resultados:
 
@@ -313,7 +309,7 @@ Al implementar los cambios anteriormente descritos, vemos los siguientes resulta
     \caption{Versión final}
 \end{figure}
 
-En la versión final podemos ver que el número de evaluaciones tiene un crecimiento más suave (casi lineal a partir de $N=10$), y el número de ciclos se reduce significativamente.
+En la versión final podemos ver que el número de evaluaciones tiene un crecimiento más suave, y el número de ciclos se reduce significativamente.
 
 \newpage
 

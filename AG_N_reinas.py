@@ -433,7 +433,6 @@ class Queens_ordered:
             
             self.criterioDeParada = True;
 
-
 class Queens_binary(Queens_ordered):
 
     def __init__(self, N, iter, pSize, K, L, pm, pc):
@@ -668,101 +667,93 @@ class Queens_binary(Queens_ordered):
 class Queens_bruteforce(Queens_ordered):
 
     def __init__(self, N):
-        # N reinas, coord
-        self.reinas = []
+        if(N<4):
+            print('''
+                El problema no tiene solución para n=2 o n=3.
+                > E. J. Hoffman et al., "Construction for the Solutions of the m Queens Problem". Mathematics Magazine, Vol. XX (1969), pp. 66–72.
+                http://penguin.ewu.edu/~trolfe/QueenLasVegas/Hoffman.pdf
+                ''')
+            exit()
+
+        elif(K>pSize):
+            print('El tamaño de muestra de torneo (', K,')tiene que ser menor que el tamaño de población (', pSize, ')')
+            exit()
+
         self.N = N
+        self.reinas = 0
+        self.coords = [(None, None) for i in range(0,self.N)]
 
-        ciclos = 0;
-        while (len(reinas) != N):
-            ciclos += 1;
-            print(reinas);
-            self.populate(reinas)
+        # Ampliación: todas las soluciones
+        self.solutions = 0
 
-        print('''
-            PARA N = {}
-            SOLUTION FOUND: {}
-            {} evaluaciones,
-            {} ciclos
-            '''.format(N, ciclos))
+    def main(self):
+        ciclos = 0
+        (x, y) = (0, 0)
 
-        # BOARD
-        board = [(y, x) for (y, x) in enumerate(reinas)]
-        Queens_ordered.print_board(self, board);
+        # Ampliación
+        criterioDeParada = True;
+        # criterioDeParada = (x<self.N);
 
-    def populate(self, reinas):
-        if(len(reinas) == 0):
-            reinas.append(r.randrange(0,self.N))
-        else:
-            # coordenadas de la nueva reina
-            x, y = self.position(reinas)
-            while x=='Error':
-                notavailable.append(reinas.pop());
-                x, y = position(reinas)
-            reinas.append([x, y])
+        while(criterioDeParada):
+            ciclos += 1
 
-    def position(self, reinas):
-        x, y = (0, 0)
-        while(not validate(reinas, x, y)):
-            if(y >= size-1):
-                return ("Error", "Error")
-            if(x >= size-1):
-                y+=1
-                x = 0
+            if(self.validate(self.coords,x,y,)):
+                self.coords[self.reinas] = (x,y)
+                self.reinas += 1
+                x, y = x+1, 0
+
+                if(self.reinas == self.N):
+                    self.solutions += 1
+                    '''
+                    print(
+                        PARA N = {}
+                        SOLUTION FOUND: {}
+                        {} ciclos
+                        .format(self.N, self.coords, ciclos))
+                    '''
+
+                    # Queens_ordered.print_board(self, self.coords);
+                    # Ampliación: break para 1 solución
+                    break;
+
+            elif(y == self.N-1):
+                # Backtracking
+                (x, y) = self.coords[self.reinas-1]
+                y += 1
+                # Eliminamos la reina actual
+                self.coords[self.reinas-1] = (None,None)
+                self.reinas -= 1
+
+                if(y >= self.N):
+                    # Doble salto de backtracking
+                    (x, y) = self.coords[self.reinas-1]
+                    if(y == None): break
+
+                    y += 1
+                    self.coords[self.reinas-1] = (None,None)
+                    self.reinas = self.reinas-1
+
             else:
-                x+=1
-        return (x, y)
+                y += 1
 
-    def validate(reinas, x, y):
-        for r in reinas:
-            if(r[0]==x or r[1]==y or r[0]-r[1] == x-y or r[1]+r[0] == y+x):
-                return False;
-        for n in notavailable:
-            if(n[0]==x and n[1]==y):
-                return False;
+        # if(self.solutions == 0):
+            # print('\nNo se ha encontrado solución en ', self.ciclos, 'iteraciones')
+        # else:
+            # print(self.solutions, 'soluciones encontradas para N =', self.N)
+
+        return ciclos
+
+    def validate(self, reinas, x, y):
+        size = len(list(filter(lambda r: r != (None, None), reinas)))
+
+        for i in range(0, size):
+            (r_x, r_y) = reinas[i]
+            if(r_x==x or
+              r_y==y or
+              r_x-r_y == x-y or
+              r_x+r_y == x+y):
+                return False
         return True
-
-
-
-
-
-
-
-'''
-
-  _ __     __ _ _   _  ___  ___ _ __  ___
- | '_ \   / _` | | | |/ _ \/ _ \ '_ \/ __|
- | | | | | (_| | |_| |  __/  __/ | | \__ \
- |_| |_|  \__, |\__,_|\___|\___|_| |_|___/
-             | |
-             |_|
-
-'''
-
-# try:
-
-'''
-Posibles paramametros:
-N: numero de reinas, dimension del tablero
-i: iteraciones del AG
-P: tamaño de población
-K: tamaño de muestra de selección
-L: número de ganadores del torneo (padres)
-
-u: umbral de fitness evaluation
-pm: probabilidad de mutación
-pc: probabilidad de cruce
-
-python3 AG_N_reinas.py 8 20000 100 20 10 0.1 0.9
-'''
-
-def_N = int(sys.argv[1])
-i = int(sys.argv[2])
-P = int(sys.argv[3])
-K = int(sys.argv[4])
-L = int(sys.argv[5])
-
-pm = float(sys.argv[6])
-pc = float(sys.argv[7])
 
 
 def meta_test():
@@ -794,8 +785,57 @@ def ods_writer():
             meanciclos = ft.reduce(lambda a,b: a+b, ciclos_sum)/10
             miniWriter.writerow([N, meaneval, meanciclos])
 
+def ods_writer_bf():
+    with open('detail.csv', 'w', newline='') as detail, open('mini.csv', 'w', newline='') as mini:
+        detailWriter = csv.writer(detail)
+        miniWriter  = csv.writer(mini)
+
+        for i in range(21,25):
+            N = i
+            ciclos_sum = []
+
+            queens = Queens_bruteforce(N)
+            ciclos = queens.main()
+            print('N=',N,' en ', ciclos, 'ciclos')
+            miniWriter.writerow([N, ciclos])
+
+
+'''
+
+  _ __     __ _ _   _  ___  ___ _ __  ___
+ | '_ \   / _` | | | |/ _ \/ _ \ '_ \/ __|
+ | | | | | (_| | |_| |  __/  __/ | | \__ \
+ |_| |_|  \__, |\__,_|\___|\___|_| |_|___/
+             | |
+             |_|
+
+Posibles paramametros:
+N: numero de reinas, dimension del tablero
+i: iteraciones del AG
+P: tamaño de población
+K: tamaño de muestra de selección
+L: número de ganadores del torneo (padres)
+
+pm: probabilidad de mutación
+pc: probabilidad de cruce
+
+Ejemplo:
+python3 AG_N_reinas.py 8 20000 100 20 10 0.1 0.9
+'''
+
+# def_N = int(sys.argv[1])
+'''
+i = int(sys.argv[2])
+P = int(sys.argv[3])
+K = int(sys.argv[4])
+L = int(sys.argv[5])
+
+pm = float(sys.argv[6])
+pc = float(sys.argv[7])
+'''
 
 #meta_test()
-ods_writer()
+ods_writer_bf()
 # queens = Queens_binary(def_N, i, P, K, L, pm, pc)
+# queens = Queens_bruteforce(def_N)
 # queens.main()

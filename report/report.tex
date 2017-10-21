@@ -279,6 +279,18 @@ A continuación se incluyen unas gráficas de la evolución de la función de fi
 
 \subsection{Resultados}
 
+En primer lugar podemos ver unas gráficas del número de ciclos y evaluaciones requeridas para hallar la primera solución para diversos valores de $N$ con la codificación binaria (tablero como vector binario de longitud $N*N$).
+
+\begin{figure}[h]
+    \center
+    \begin{subfigure}{.50\textwidth}
+        \includegraphics[width=\textwidth]{binary}
+    \end{subfigure}
+    \caption{Codificación binaria}
+\end{figure}
+
+A pesar de cachear las evaluaciones, al trabajar con individuos mucho más grandes, la variabilidad de estos y el espacio de búsqueda son mucho más grandes (no se restringen posiciones ni número de reinas).
+
 A continuación podemos ver una gráfica del número de ciclos y evaluaciones requeridas para hallar una primera solución para diversos valores de $N$ con las primeras versiones del algoritmo. Para cada valor de $N$ se ha ejecutado el código 10 veces con los mismos parámetros para trabajar con valores medios.
 
 \begin{figure}[h]
@@ -286,7 +298,7 @@ A continuación podemos ver una gráfica del número de ciclos y evaluaciones re
     \begin{subfigure}{.50\textwidth}
         \includegraphics[width=\textwidth]{before}
     \end{subfigure}
-    \caption{Primera versión}
+    \caption{Primera versión con codificación ordenada}
 \end{figure}
 
 Podemos ver que el número de ciclos y evaluaciones se disparan por el crecimiento del espacio de búsqueda y por el aumento en la variedad de los individuos respectivamente.
@@ -313,15 +325,22 @@ Probar con los tres métodos.
 
 \section{Conclusiones, Problemas Encontrados y Opiniones Personales}
 
-Problemas:
-estancamiento.
+\subsection{Conclusiones}
 
-De menor a mayor estancamiento en cruce:
-- cruce SCX aleatorio
-- cruce SCX no ordenado
-- cruce SCX
+La memoria debe finalizar con unas conclusiones en las que resumáis los resultados de vuestro análisis: ¿qué técnica funciona mejor?, ¿cómo afecta a los resultados vuestra codificación mejorada?, ¿cómo escala cada técnica a valores elevados de N?, etc.
 
-lentitud de código. Solución propuesta: paralelizar. Resultados? no.
+\subsection{Problemas encontrados}
+\begin{itemize}
+    \item Estancamiento. De menor a mayor estancamiento en cruce:
+    \begin{itemize}
+        \item cruce SCX aleatorio
+        \item cruce SCX no ordenado
+        \item cruce SCX
+    \end{itemize}
+    \item Lentitud de ejecución del código. Solución propuesta: paralelizar. Resultados? no.
+\end{itemize}
+
+\subsection{Opiniones personales}
 
 
 \end{document}

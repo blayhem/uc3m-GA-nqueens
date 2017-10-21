@@ -378,7 +378,6 @@ class Queens_ordered:
 
         return offspring
 
-
     def mutacion(self, individuo):
         p = self.diversityIndex*self.pm #*self.N;     # probabilidad de mutación
         size = len(individuo)
@@ -401,14 +400,15 @@ class Queens_ordered:
         print('')
 
     def print_board(self, board):
-        n = len(board)
+        n = self.N
         self.print_line(n)
         for i in range(0,n):
             print('\t\t|',end='')
             for j in range(0,n):
-                if(board[i]==(i,j)):
+                try:
+                    test = list(filter(lambda pos: pos==(i,j), board))[0]
                     print(' R |',end='')
-                else:
+                except:
                     print('   |',end='')
             print('')
             self.print_line(n)
@@ -419,18 +419,18 @@ class Queens_ordered:
             self.solutions.append(individuo);
 
             # STATS
-            '''
-            print(
+
+            print('''
                 PARA N = {}
                 SOLUTION FOUND: {}
                 {} evaluaciones,
                 {} ciclos
-                .format(self.N, individuo, self.evaluaciones, self.ciclos))
+                '''.format(self.N, individuo, self.evaluaciones, self.ciclos))
 
             # BOARD
             board = [(y, x) for (y, x) in enumerate(individuo)]
             self.print_board(board);
-            '''
+            
             self.criterioDeParada = True;
 
 
@@ -472,18 +472,22 @@ class Queens_binary(Queens_ordered):
 
         # INIT
         poblacion = [];
+        size = N*N;
         for p in range(0, pSize):
-            individuo = [r.randrange(0,2) for i in range(0,N*N)]
+            individuo = [0 for i in range(0,size)]
+            for queens in range(0, N):
+                individuo[r.randrange(0,size)] = 1
             poblacion.append(individuo);
 
         self.poblacion = poblacion;
 
     def main(self):
-        bar = progressbar.ProgressBar(redirect_stdout=False)
+        # bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
         # backup = []
         while ( self.ciclos < self.iter):
             try:
+                # print(poblacion,'\n')
                 # bar.update((self.ciclos*100)/self.iter)
                 # selección
                 padres = [Queens_ordered.seleccion(self, poblacion, i%2==0, False) for i in range(0,2*self.L)]
@@ -491,15 +495,15 @@ class Queens_binary(Queens_ordered):
                 nuevaPoblacion = self.cruce_SP(padres);
                 poblacion = poblacion[self.L*2:]
                 # mutación
-                nuevaPoblacion = list(map(lambda ind: Queens_ordered.mutacion(self, ind), nuevaPoblacion));
+                nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), nuevaPoblacion));
                 poblacion += nuevaPoblacion;
                 self.ciclos += 1;
 
                 for individuo in poblacion:
-                    Queens_ordered.check_exit(self, individuo)
+                    self.check_exit(individuo)
 
                 bestValue = min(self.fitnesses.values())
-                print('Best individual fitness: ', bestValue, 'worst individual fitness: ', max(self.fitnesses.values()), 'diversityIndex: ', int(self.diversityIndex))
+                # print('Best individual fitness: ', bestValue, 'worst individual fitness: ', max(self.fitnesses.values()), 'diversityIndex: ', int(self.diversityIndex))
                 if(bestValue == self.bestValue):
                     self.diversityIndex += 0.01
                     if(self.diversityIndex>10):
@@ -512,19 +516,23 @@ class Queens_binary(Queens_ordered):
                 if(self.criterioDeParada):
                     break;
 
-                if(bestValue==1):
+                if(bestValue==0.0):
                     # forzamos
                     for individuo in poblacion:
-                        Queens_ordered.check_exit(self, individuo)
+                        self.check_exit(individuo)
+                # print(poblacion,'\n')
+                # if(self.ciclos > 4): break;
 
             except KeyboardInterrupt:
                 print('RTL+C. Parando.')
                 break
-
+        '''
         if(len(self.solutions) == 0):
             print('\nNo solution found. ', self.evaluaciones, 'evaluaciones', 'máximo fitness: ', self.bestValue, 'en ', self.ciclos, 'iteraciones')
         else:
             print(len(self.solutions), 'soluciones encontradas')
+        '''
+        return (self.evaluaciones, self.ciclos)
 
     def getFitnessWithURL(self, individuo):
         key = ''.join(str(n) for n in individuo)
@@ -552,26 +560,50 @@ class Queens_binary(Queens_ordered):
             evaluable = individuo[:]
             self.evaluaciones += 1;
             bad = 0;
-            for (ind_y, ind_x) in enumerate(individuo): # posiciones de reinas
-                for(r_y) in range(ind_y+1, len(individuo)):
-                    r_x = individuo[r_y]
-                    if(r_y == ind_y):
-                        continue; # mismo individuo
-                    elif(r_x==ind_x or
+            queens = 0;
+            for (i, value) in enumerate(individuo): # posiciones de reinas
+                if(value==0):
+                    continue;
+                else:
+                    queens += 1;
+                    (ind_x) = i%self.N
+                    (ind_y) = int(i/self.N)
+                for j in range(i+1, len(individuo)):
+                    value = individuo[j]
+                    if(value==0):
+                        continue;
+                    else: 
+                        (r_x) = j%self.N
+                        (r_y) = int(j/self.N)
+
+                    if(r_x==ind_x or
                       r_y==ind_y or
                       r_x-r_y == ind_x-ind_y or
                       r_x+r_y == ind_x+ind_y):
                         bad  += 1;
 
-                index = evaluable.index(ind_x)
-                evaluable.pop(index); # quitamos 1 reina adyacente para tener solo 1 arista
+                # index = evaluable.index(ind_x)
+                # evaluable.pop(index); # quitamos 1 reina adyacente para tener solo 1 arista
 
         # return (n/N - bad/n)
-        if(bad == 0):
-            fitness = 1;
-        else:
-            fitness = (1 - bad/self.N)
+        # if(bad == 0):
+            # return bad;
+        # else:
+            # best = 0
+        fitness = (abs(self.N-queens) + bad)
+        # print('bad: ', bad)
         self.fitnesses[key] = fitness
+
+        '''
+        board = []
+        for (i, valor) in enumerate(individuo):
+            if(valor==1):
+                board.append((int(i/self.N), i%self.N))
+        self.print_board(board);
+        print(fitness)
+        exit()
+        '''
+
         return fitness;
 
     def cruce_SP(self, padres):
@@ -594,6 +626,44 @@ class Queens_binary(Queens_ordered):
             offspring.append(hijo2)
 
         return offspring
+
+    def mutacion(self, individuo):
+        p = self.diversityIndex*self.pm #*self.N;     # probabilidad de mutación
+        size = len(individuo)
+
+        # swap 1 individuo solo
+        # for i in range(0, size):
+        if(r.uniform(0, 1) < p):
+            i = r.randrange(0, size);
+            flip = list(filter(lambda n: n!= individuo[i], [0,1]))[0]
+            individuo[i] = flip
+
+        return individuo;
+
+    def check_exit(self, individuo):
+        fitness = self.getFitness(individuo);
+        if(fitness == 0 and individuo not in self.solutions):
+            self.solutions.append(individuo);
+
+            # STATS
+            '''
+            print(
+                PARA N = {}
+                SOLUTION FOUND: {}
+                {} evaluaciones,
+                {} ciclos
+                .format(self.N, individuo, self.evaluaciones, self.ciclos))
+
+            # BOARD
+            board = []
+            for (i, valor) in enumerate(individuo):
+                if(valor==1):
+                    board.append((int(i/self.N), i%self.N))
+            # print(board)
+            self.print_board(board);
+            '''
+
+            self.criterioDeParada = True;
 
 class Queens_bruteforce(Queens_ordered):
 
@@ -714,6 +784,7 @@ def ods_writer():
             for j in range(0,10):
                 queens = Queens_binary(N, i, P, K, L, pm, pc)
                 (evaluaciones, ciclos) = queens.main()
+                print('N=',N,' en ', evaluaciones,'evaluaciones y', ciclos, 'ciclos')
                 evaluaciones_sum.append(evaluaciones)
                 ciclos_sum.append(ciclos)
                 row = [N, evaluaciones, ciclos]
@@ -726,5 +797,5 @@ def ods_writer():
 
 #meta_test()
 ods_writer()
-# queens = Queens_ordered(def_N, i, P, K, L, pm, pc)
+# queens = Queens_binary(def_N, i, P, K, L, pm, pc)
 # queens.main()

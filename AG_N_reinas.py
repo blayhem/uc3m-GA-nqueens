@@ -77,7 +77,8 @@ class Queens_ordered:
         # bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
 
-        while(True):
+        criterioDeParada =  self.solutions < 92 # True # self.ciclos < self.iter
+        while(criterioDeParada):
         # while ( self.ciclos < self.iter):
             try:
                 # bar.update((self.ciclos*100)/self.iter)
@@ -154,7 +155,7 @@ class Queens_ordered:
         if(len(self.solutions) == 0):
             print('\nNo solution found. ', self.evaluaciones, 'evaluaciones', 'máximo fitness: ', self.bestValue, 'en ', self.ciclos, 'iteraciones')
         else:
-            print(len(self.solutions), 'soluciones encontradas para N=', self.N)
+            print(len(self.solutions), 'soluciones encontradas para N=', self.N, 'en', self.evaluaciones, 'evaluaciones', 'y', self.ciclos, 'iteraciones')
         '''
         plt.plot(self.fvalues)
         title = 'N={}, K={}, L={}, p. de mutación={}, p. de cruce={}'.format(self.N, self.K, self.L, self.pm, self.pc)
@@ -404,16 +405,16 @@ class Queens_ordered:
             self.solutions.append(individuo);
 
             # STATS
-            print('''
+            '''print(
                 PARA N = {}
                 SOLUTION FOUND: {}
                 {} evaluaciones,
                 {} ciclos
-                '''.format(self.N, individuo, self.evaluaciones, self.ciclos))
-
+                .format(self.N, individuo, self.evaluaciones, self.ciclos))
+            '''
             # BOARD
-            board = [(y, x) for (y, x) in enumerate(individuo)]
-            self.print_board(board);
+            # board = [(y, x) for (y, x) in enumerate(individuo)]
+            # self.print_board(board);
             
             self.criterioDeParada = True;
 
@@ -467,7 +468,8 @@ class Queens_binary(Queens_ordered):
     def main(self):
         # bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
-        while ( self.ciclos < self.iter):
+        criterioDeParada =  self.solutions < 92 # self.ciclos < self.iter
+        while(criterioDeParada):
             try:
                 # bar.update((self.ciclos*100)/self.iter)
                 # selección
@@ -632,10 +634,6 @@ class Queens_bruteforce(Queens_ordered):
                 ''')
             exit()
 
-        elif(K>pSize):
-            print('El tamaño de muestra de torneo (', K,')tiene que ser menor que el tamaño de población (', pSize, ')')
-            exit()
-
         self.N = N
         self.reinas = 0
         self.coords = [(None, None) for i in range(0,self.N)]
@@ -644,6 +642,7 @@ class Queens_bruteforce(Queens_ordered):
         self.solutions = 0
 
     def main(self):
+        solutions = []
         ciclos = 0
         (x, y) = (0, 0)
 
@@ -660,18 +659,19 @@ class Queens_bruteforce(Queens_ordered):
                 x, y = x+1, 0
 
                 if(self.reinas == self.N):
-                    self.solutions += 1
-                    '''
-                    print(
-                        PARA N = {}
-                        SOLUTION FOUND: {}
-                        {} ciclos
-                        .format(self.N, self.coords, ciclos))
-                    '''
-
+                    if(self.coords not in solutions):
+                        solutions.append(self.coords[:])
+                        self.solutions += 1
+                        '''print(
+                            [N-Queens GA bruteforce]
+                            N={}
+                            Solution: {}
+                            Ciclos: {}
+                            .format(self.N, self.coords, ciclos))
+                        '''
                     # Queens_ordered.print_board(self, self.coords);
                     # Ampliación: break para 1 solución
-                    break;
+                    # break;
 
             elif(y == self.N-1):
                 # Backtracking
@@ -693,10 +693,10 @@ class Queens_bruteforce(Queens_ordered):
             else:
                 y += 1
 
-        # if(self.solutions == 0):
-            # print('\nNo se ha encontrado solución en ', self.ciclos, 'iteraciones')
-        # else:
-            # print(self.solutions, 'soluciones encontradas para N =', self.N)
+        if(self.solutions == 0):
+            print('\nNo se ha encontrado solución en ', ciclos, 'iteraciones')
+        else:
+            print(self.solutions, 'soluciones encontradas para N =', self.N, 'en ', ciclos, 'iteraciones')
 
         return ciclos
 
@@ -792,6 +792,26 @@ pc = float(sys.argv[7])
 
 # meta_test()
 # csv_writer_bf()
-queens = Queens_ordered(def_N, i, P, K, L, pm, pc)
-# queens = Queens_bruteforce(def_N)
-queens.main()
+# queens = Queens_ordered(def_N, i, P, K, L, pm, pc)
+
+TODO: CAMBIAR EL CRITERIO DE PARADA PRIMERO
+
+print('''
+    BRUTE FORCE:
+    ''')
+queens1 = Queens_bruteforce(def_N)
+queens1.main()
+
+print('''
+    BINARY:
+    ''')
+
+queens2 = Queens_binary(def_N, i, P, K, L, pm, pc)
+queens2.main()
+
+print('''
+    ORDERED:
+    ''')
+
+queens2 = Queens_ordered(def_N, i, P, K, L, pm, pc)
+queens2.main()

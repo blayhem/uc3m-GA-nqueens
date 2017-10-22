@@ -1,4 +1,5 @@
 \documentclass[12pt]{article}
+\usepackage[table]{xcolor}
 \usepackage{makeidx}
 \usepackage[margin=1in]{geometry}  % set the margins to 1in on all sides
 \usepackage{graphicx}              % to include figures
@@ -90,9 +91,9 @@
 
 \newpage
 
-\section{Contexto.}
+\section{Contexto}
 
-\subsection{Problema de las 8 reinas.}
+\subsection{Problema de las 8 reinas}
 
 El problema de las ocho reinas es un problema clásico en computación y matemáticas, el cual consiste en colocar ocho reinas en un tablero de ajedrez (de 8 casillas) sin que se amenacen entre sí (en ajedrez, las reinas pueden moverse tantas casillas como quieran en cualquier dirección).
  
@@ -104,18 +105,18 @@ Edsger Dijkstra usó este problema en 1972 para ilustrar el poder de la llamada 
 Para nuestro problema, tomaremos un enfoque más abstracto: dado un tablero de dimensiones $NxN$, queremos colocar $N$ reinas sin que se ataquen entre ellas.
 
 
-\subsection{Problema planteado.}
+\subsection{Problema planteado}
 Se plantea resolver el problema de las N-reinas para un valor de $N$ muy inferior a 1000 sin necesidad de hallar todas las soluciones, mediante la utilización de un Algoritmo Genético.
 
-Primero afrontaremos el problema mediante un algoritmo de fuerza bruta con backtracking, para estudiar cuánto tarda en hallar posibles soluciones dentro del espacio de búsqueda.
+Primero afrontaremos el problema mediante un algoritmo de fuerza bruta con \emph{backtracking}, para estudiar cuánto tarda en hallar posibles soluciones dentro del espacio de búsqueda.
 
 A continuación, se implementa un Algoritmo Genético con el fin de hallar las soluciones para valores de $N$ computacionalmente intensos.
 
-\section{Solucionar las N-reinas empleando fuerza bruta.}
+\section{Solucionar las N-reinas empleando fuerza bruta}
 
 Para esta aproximación al problema implementamos una solución por fuerza bruta al problema de las N-reinas. Esta implementación funciona tanto para encontrar una solución al problema como para encontrar todas (con diferentes criterios de parada y modificando ligeramente el código).
 
-La implementación empieza con un vector de $N$ reinas colocadas en coordenadas nulas, e intenta progresivamente colocarlas sobre el tablero, comprobando para cada una de ellas si no es adyacente a otra de las reinas ya colocadas anteriormente. Si no es así, se coloca la reina. Si recorremos todas las filas y no hemos sido capaces de colocar la reina que falta, hacemos backtrack eliminando la última reina colocada sobre el tablero (vector de coordenadas) y vuelta a empezar. Si esta opción tampoco es válida, necesitamos hacer doble backtracking para volver a una rama anterior para seguir explorando el árbol de búsqueda. Esto se consigue eliminando una reina más.
+La implementación empieza con un vector de $N$ reinas colocadas en coordenadas nulas, e intenta progresivamente colocarlas sobre el tablero, comprobando para cada una de ellas si no es adyacente a otra de las reinas ya colocadas anteriormente. Si no es así, se coloca la reina. Si recorremos todas las filas y no hemos sido capaces de colocar la reina que falta, hacemos \emph{backtrack} eliminando la última reina colocada sobre el tablero (vector de coordenadas) y vuelta a empezar. Si esta opción tampoco es válida, necesitamos hacer doble \emph{backtracking} para volver a una rama anterior para seguir explorando el árbol de búsqueda. Esto se consigue eliminando una reina más.
 
 Esta implementación es muy rápida ya que el código es simple, y para valores relativamente pequeños de $N$ el espacio de búsqueda no es muy grande. Considerando cada intento de colocar una reina como un ciclo, obtenemos los siguientes resultados:
 
@@ -128,9 +129,9 @@ Esta implementación es muy rápida ya que el código es simple, y para valores 
 \end{figure}
 
 \newpage
-\section{Solucionar las N-reinas con Algoritmos Genéticos.}
+\section{Solucionar las N-reinas con Algoritmos Genéticos}
 
-\subsection{Codificación.}
+\subsection{Codificación}
 
 La codificación actual para nuestro problema trata de un vector de tamaño $N$, donde cada valor corresponde a la posición $x$ de una reina sobre la fila $y$ del tablero, siendo $y$ el índice del elemento $x$ en el vector de reinas.
 
@@ -144,22 +145,22 @@ Al darnos cuenta de que los números $x$ e $y$ han de ser excluyentes (restricci
 
 \subsubsection{¿Por qué la codificación actual es mejor que las otras?}
 
-Esta codificación es mucho más eficiente que las codificaciones anteriormente propuestas, ya que ocupa mucho menos espacio en memoria (un vector de ints ocupa $K*N$ bits, siendo $K=4$ para una arquitectura estándar de 32-bit o 64-bit, frente a la peor solución anteriormente propuesta, un vector $N*N$ binario, que ocuparía $N*N$ bits).
+Esta codificación es mucho más eficiente que las codificaciones anteriormente propuestas, ya que ocupa mucho menos espacio en memoria (un vector de enteros ocupa $K*N$ bits, siendo $K=4$ para una arquitectura estándar de 32-bit o 64-bit, frente a la peor solución anteriormente propuesta, un vector $N*N$ binario, que ocuparía $N*N$ bits).
 
 Además, esta codificación lleva implícitas las restricciones de fila y columna para cada reina. La restricción fila va implícita en la propia estructura de datos (no puede haber dos elementos en la misma posición de la lista), y la restricción columna va implícita en el hecho de que los valores del vector son permutaciones de $N$ (no se repite ningún valor de $x$).
 
 Esto nos elimina automáticamente muchas soluciones inválidas de la población, agilizando el algoritmo y permitiendo encontrar una solución mucho más rápidamente.
 
-\subsection{Función de fitness.}
+\subsection{Función de \emph{fitness}}
 
-Se plantean dos funciones de fitness para el problema a tratar:
+Se plantean dos funciones de \emph{fitness} para el problema a tratar:
 
 \begin{enumerate}
     \item En primer lugar, y considerando que no llegamos a posicionar $N$ número de reinas, se considera la función $F=\frac{n}{N} - \frac{b}{n}$, siendo $n$ el número total de reinas posicionadas sobre el tablero frente a $N$ (número ideal de reinas y dimensión del lado del tablero), y $b$ el número de reinas mal posicionadas. Esta función vale 1 cuando todas las reinas están bien posicionadas, y 0 cuando están todas mal posicionadas, o no hay reinas sobre el tablero.
-    \item Considerando que, debido a nuestra codificación, no existe la posibilidad de que $n$ sea distinta de $N$ (siempre hay $N$ reinas sobre el tablero, aunque estén mal situadas), se propone la función $F=1-\frac{b}{N}$, que no es más que una substitución de $n=N$ en la función propuesta anteriormente. Esta es la función implementada.
+    \item Considerando que, debido a nuestra codificación, no existe la posibilidad de que $n$ sea distinta de $N$ (siempre hay $N$ reinas sobre el tablero, aunque estén mal situadas), se propone la función $F=1-\frac{b}{N}$, que no es más que una sustitución de $n=N$ en la función propuesta anteriormente. Esta es la función implementada.
 \end{enumerate}
 
-Nuestro algoritmo incorpora también un caché de fitness por individuo, con el objetivo de evitar evaluaciones sobre individuos idénticos. De esta forma, los accesos a caché no se cuentan como evaluaciones, sólo cuando es necesario calcular el fitness del individuo dado.
+Nuestro algoritmo incorpora también un caché de \emph{fitness} por individuo, con el objetivo de evitar evaluaciones sobre individuos idénticos. De esta forma, los accesos a caché no se cuentan como evaluaciones, sólo cuando es necesario calcular el \emph{fitness} del individuo dado.
 
 \subsection{Métodos implementados}
 
@@ -169,7 +170,7 @@ El método de selección aplicado para nuestro problema es una selección por to
 
 Para esta selección tomamos un parámetro $K$ que se corresponde con el tamaño de la muestra de población que tomamos para nuestro torneo. A continuación, evaluamos la muestra y seleccionamos al mejor individuo un número de veces definido por el parámetro $L$ (el número de hijos que queremos conseguir a partir de $L*2$ padres).
 
-Originalmente, se implementa el método de selección sugerido en el libro \emph{An Introduction to Genetic Algorithms} (Melanie, M. 1996), en el cual la selección por torneo ordenaba la muestra de tamaño $K$ por su grado de fitness, y seleccionaba los dos mejores como padres de la nueva población. Por razones de simplificación, se decide que el corte se realiza en $L$, quedando por defecto un tamaño de muestra $K$ y un tamaño de ganadores del torneo de $L$.
+Originalmente, se implementa el método de selección sugerido en el libro \emph{An Introduction to Genetic Algorithms} (Melanie, M. 1996), en el cual la selección por torneo ordenaba la muestra de tamaño $K$ por su grado de \emph{fitness}, y seleccionaba los dos mejores como padres de la nueva población. Por razones de simplificación, se decide que el corte se realiza en $L$, quedando por defecto un tamaño de muestra $K$ y un tamaño de ganadores del torneo de $L$.
 
 Sin embargo, se llegó a la conclusión de que era mejor repetir el proceso de torneo $L$ veces hasta conseguir el número deseado de padres.
 
@@ -177,13 +178,13 @@ El método de selección escogido va acompañado de la política de reemplazo co
 
 \subsubsection{Cruce}
 
-El cruce que se implementa es una recombinación discreta entre los dos padres con cuidado de no repetir ninguno de los anteriores valores de $N$ 
+El cruce que se implementa es una recombinación discreta entre los dos padres con cuidado de no repetir ninguno de los anteriores valores de $N$.
 
 En el código se implementan tres métodos de cruce:
 
 \begin{itemize}
     \item \textbf{Cruce secuencial constructivo aleatorio}: vamos construyendo el hijo progresivamente (de longitud $0$ a $N$, donde el valor $i$-ésimo del hijo corresponderá con el bit $i$ de uno de los padres, escogido al azar.
-    \item \textbf{Cruce secuencial constructivo (SCX)}: parecido al método anterior, este método va construyendo progresivamente el hijo con una pseudo-evaluación a modo de heurística. Para cada par de bits ($p1, p2$) se evalúa su coste (fitness del individuo $F'(I)=F(I)+p$) de ser añadido al hijo, y se coge el bit que mejora el fitness del individuo.
+    \item \textbf{Cruce secuencial constructivo (SCX)}: parecido al método anterior, este método va construyendo progresivamente el hijo con una pseudo-evaluación a modo de heurística. Para cada par de bits ($p1, p2$) se evalúa su coste (\emph{fitness} del individuo $F'(I)=F(I)+p$) de ser añadido al hijo, y se coge el bit que mejora el \emph{fitness} del individuo.
 
     Ejemplo: 
     
@@ -191,7 +192,7 @@ En el código se implementan tres métodos de cruce:
     
     $h =[1]$ (inicializado al azar) $\rightarrow$ se evalúa $h_1=[1,3]$ y $h_2=[1,2]$. 
     
-    Si se considera que $h_1=[1,3]$ tiene mejor fitness que $h_2=[1,2]$, $h=[1,3]$, y así N veces hasta completar el hijo.
+    Si se considera que $h_1=[1,3]$ tiene mejor \emph{fitness} que $h_2=[1,2]$, $h=[1,3]$, y así N veces hasta completar el hijo.
 
     \item \textbf{Cruce ordenado 1 (OC1)}: sean dos padres $p1$ y $p2$, uno de ellos se considera cadena de \emph{corte} y otro cadena de \emph{llenado}. Se selecciona una sub-cadena del primer padre y se inserta en el hijo respetando la posición original. Se llenan los huecos laterales con los valores del otro padre que no están ya en la sub-cadena seleccionada del primero (para no repetir valores).
 
@@ -215,9 +216,9 @@ En el código se implementan tres métodos de cruce:
 
 \begin{enumerate}
     \item Primera aproximación: se mutan los dos hijos con probabilidad $p_m$. Aproximación clásica: por cada bit del individuo, se evalúa su probabilidad de mutación, y se cambia el bit (0-1). Al no ser codificación binaria, lo cambiamos por valores 0-N.
-    \item Segunda aproximación: con (1) obtenemos resultados repetidos, nuestra codificación es una permutación de columnas (valores 0-N). Por lo tanto, evaluamos la probabilidad del individuo entero de mutar, y si es positiva hacemos un reordenamiento de sus valores (shuffle).
+    \item Segunda aproximación: con (1) obtenemos resultados repetidos, nuestra codificación es una permutación de columnas (valores 0-N). Por lo tanto, evaluamos la probabilidad del individuo entero de mutar, y si es positiva hacemos un reordenamiento de sus valores (\emph{shuffle}).
     \item Tercera aproximación: con (2) obtenemos valores demasiado aleatorios con una probabilidad de mutación elevada. Nuestra aproximación esta vez consiste de nuevo en evaluar la probabilidad de mutación bit a bit, y en caso de ser positiva, intercambiando dicho bit con otro bit del individuo de manera aleatoria. De esta forma, en caso de mutar 1 bit, el individuo sólo diferirá del original en 2 bits.
-    \item Cuarta aproximación: con (3) se estanca mucho. Queremos mutar el individuo más, introducimos un índice de diversidad. Este índice multiplica la probabilidad de mutación hasta 1, momento en el cual se resetea de nuevo (para evitar demasiada aleatoriedad). Cambiamos también el planteamiento de (3), ahora considera la probabilidad pm para todo el individuo, y en caso positivo hace un solo cambio de un par de bits (swap).
+    \item Cuarta aproximación: con (3) se estanca mucho. Queremos mutar el individuo más, introducimos un índice de diversidad. Este índice multiplica la probabilidad de mutación hasta 1, momento en el cual se resetea de nuevo (para evitar demasiada aleatoriedad). Cambiamos también el planteamiento de (3), ahora considera la probabilidad pm para todo el individuo, y en caso positivo hace un solo cambio de un par de bits (\emph{swap}).
     
 \end{enumerate}
 \textbf{Nota:}
@@ -225,9 +226,9 @@ la probabilidad de mutar depende de N, ya que el número de bits a mutar depende
 
 
 \subsubsection{Evaluación de la población: posibles soluciones}
-En primer lugar, recorremos toda la población evaluando el fitness de cada individuo. En caso de encontrar un individuo con fitness perfecto ($1$), es decir, una solución, se imprime por pantalla la solución, el número de evaluaciones hasta ese momento, así como el número de ciclos.
+En primer lugar, recorremos toda la población evaluando el \emph{fitness} de cada individuo. En caso de encontrar un individuo con \emph{fitness} perfecto ($1$), es decir, una solución, se imprime por pantalla la solución, el número de evaluaciones hasta ese momento, así como el número de ciclos.
 
-En caso de no encontrar solución, revisamos igualmente el fitness del mejor individuo de la población para ver si ha mejorado de una generación a otra. En caso contrario, modificamos el índice de diversidad descrito anteriormente.
+En caso de no encontrar solución, revisamos igualmente el \emph{fitness} del mejor individuo de la población para ver si ha mejorado de una generación a otra. En caso contrario, modificamos el índice de diversidad descrito anteriormente.
 
 \subsection{Parametrización}
 
@@ -235,9 +236,9 @@ En \emph{An Introduction to Genetic Algorithms} (Melanie, M. 1996) se menciona u
 
 En el mismo libro, Grefenstette (1986) propone un tamaño de población de 20 a 30 individuos, probabilidad de cruce de 0.75 a 0.95, y tasa de mutación de 0.005 a 0.01.
 
-Los parámetros usados finalmente son: un tamaño de población de 100 individuos, un tamaño de torneo de 4 individuos (con una probabilidad de "suerte" -que no salga elegido el mejor- de 0.75), 80 hijos generados (con un reemplazo generacional del 80\%), probabilidad de cruce de 0.9, y tasa de mutación de 0.03.
+Los parámetros usados finalmente son: un tamaño de población de 100 individuos, un tamaño de torneo de 4 individuos (con una probabilidad de 'suerte' [que no salga elegido el mejor] de 0.75), 80 hijos generados (con un reemplazo generacional del 80\%), probabilidad de cruce de 0.9, y tasa de mutación de 0.03.
 
-A continuación se incluyen unas gráficas de la evolución de la función de fitness a lo largo de varias iteraciones, donde podemos ver que con los parámetros anteriores (mejor reemplazo generacional, torneos más grandes, menor probabilidad de cruce, etc.) se llegaba a mínimos locales locales y la población se estancaba muy pronto.
+A continuación se incluyen unas gráficas de la evolución de la función de \emph{fitness} a lo largo de varias iteraciones, donde podemos ver que con los parámetros anteriores (mejor reemplazo generacional, torneos más grandes, menor probabilidad de cruce, etc.) se llegaba a mínimos locales y la población se estancaba muy pronto.
 
 \newcounter{dejong}
 \begin{figure}[h]
@@ -283,7 +284,7 @@ A continuación se incluyen unas gráficas de la evolución de la función de fi
 
 \subsection{Resultados}
 
-En primer lugar podemos ver unas gráficas del número de ciclos y evaluaciones requeridas para hallar la primera solución para diversos valores de $N$ con la codificación binaria (tablero como vector binario de longitud $N*N$). Esta codificación se evalúa con funciones canónicas (selección por torneo, cruce simple, mutación de bit-flipping sujeta a probabilidad...).
+En primer lugar podemos ver unas gráficas del número de ciclos y evaluaciones requeridas para hallar la primera solución para diversos valores de $N$ con la codificación binaria (tablero como vector binario de longitud $N*N$). Esta codificación se evalúa con funciones canónicas (selección por torneo, cruce simple, mutación de \emph{bit-flipping} sujeta a probabilidad...).
 
 Para cada valor de $N$ se ha ejecutado el código 10 veces con los mismos parámetros para evaluar con valores medios.
 
@@ -319,22 +320,63 @@ Al implementar los cambios anteriormente descritos, vemos los siguientes resulta
     \caption{Versión final}
 \end{figure}
 
-En la versión final podemos ver que el número de evaluaciones tiene un crecimiento más suave, y el número de ciclos se reduce significativamente.
+En la versión final podemos ver que el número de evaluaciones tiene un crecimiento más suave y el número de ciclos se reduce significativamente.
 
-\section{Ampliación}
+\section{Ampliación: todas las soluciones}
 
-\subsection{Todas las soluciones}
+Dado que el problema original de las 8 reinas se sabe que tiene 92 soluciones, se considera ese valor para nuestra $N$ para poder evaluar las tres aproximaciones al problema anteriormente descritas, considerando como condición de parada que nuestro algoritmo encuentre 92 soluciones.
 
-Dado que el problema original de las 8 reinas se sabe que tiene 92 soluciones, se considera ese valor para nuestra $N$ para poder evaluar las tres aproximaciones al problema anteriormente descritas considerando como condición de parada que nuestro algoritmo encuentre 92 soluciones.
+A continuación se detallan el número necesario de ciclos y evaluaciones para intentar encontrar las 92 soluciones para $N=8$ con el algoritmo de fuerza bruta, el algoritmo genético con codificación binaria, y el algoritmo genético con codificación ordenada.
 
-A continuación se detallan el número necesario de ciclos y evaluaciones para encontrar las 92 soluciones.
+\definecolor{tblue}{HTML}{427BB3}
+\begin{figure}[h]
+    \center
+    {\rowcolors{2}{white}{tblue!30}
+    \begin{tabular}{|c c c c c|}
+        \hline
+        \rowcolor{gray!10} & Soluciones & Ciclos & Evaluaciones & Tiempo \\
+        \hline
+        Fuerza bruta & 92 & 16456 & - & 0.151s\\ 
+        \hline
+        AG c. binaria & 2 & 381172 & 9252 & 33m23s\\
+        \hline
+        AG c. ordenada & 22 & 1628883 & 5484 & 2h46m01s\\
+        \hline
+    \end{tabular}
+    }
+    \caption{Resultados para diversas soluciones}
+\end{figure}
 
-Tamaño de tablero: $8x8$, soluciones: 92.
+Aunque los tiempos, el número de soluciones y ciclos varíen, se puede observar claramente que el algoritmo de fuerza bruta mejora muy sustancialmente los resultados de los otros dos (para un número pequeño de $N$ como es 8). El genético con la codificación ordenada no tiene mal desempeño en número de soluciones dadas y evaluaciones requeridas, pero sí en tiempo de ejecución y en ciclos.
 
-Tabla: ciclos, evaluaciones, tiempo
-Para: fuerza bruta, AG binario, AG ordenado
+El genético con la codificación binaria es el que peor resultado obtiene, consiguiendo sacar solo dos soluciones en 381 172 ciclos y algo más de 30 minutos de ejecución.
 
-\section{Conclusiones, Problemas Encontrados y Opiniones Personales}
+Aquí podemos ver en detalle el número de ciclos necesarios para hallar las soluciones 1 a 22 en el algoritmo genético con codificación ordenada.
+
+\clearpage\newpage
+\begin{figure}[h]
+    \center
+    \begin{subfigure}{.50\textwidth}
+        \includegraphics[width=\textwidth]{solucionesAGO}
+    \end{subfigure}
+    \caption{Ciclos necesarios para hallar varias soluciones}
+\end{figure}
+
+A partir de este conjunto de datos se intenta ajustar los valores a una ecuación polinómica que nos sirva para poder predecir el número de ciclos dado un cierto número de soluciones. Usamos esta técnica para intentar predecir el número de iteraciones que serían necesarias para conseguir 92 soluciones.
+
+\begin{figure}[h]
+    \center
+    \begin{subfigure}{.90\textwidth}
+        \includegraphics[width=\textwidth]{fitting}
+    \end{subfigure}
+    \caption{Ecuación de ajuste con los datos previamente representados}
+\end{figure}
+
+Si sustituimos el número de soluciones deseadas (92) en la ecuación anterior, obtenemos un valor de $5.40445*10^9$ ciclos. Teniendo en cuenta que el tiempo medio por ciclo es de $0.01075124740600586$ segundos, el tiempo estimado para hallar 92 soluciones en un tablero de $8x8$ con nuestro algoritmo genético de codificación ordenada sería alrededor de 16 140 horas ($672.5$ días, o $1.84$ años, según se prefiera).
+
+\clearpage\newpage
+
+\section{Conclusiones, Problemas encontrados y Opiniones personales}
 
 \subsection{Conclusiones}
 
@@ -349,7 +391,7 @@ Esta aproximación al problema puede ser buena cuando la evaluación de la funci
 A lo largo del desarrollo de la práctica, hemos encontrado los siguientes problemas:
 
 \begin{itemize}
-    \item Estancamiento: con la mayoría de los métodos y mecanismos genéticos, la población era muy dada a estancarse muy rápidamente. El valor de fitness del mejor individuo de la población era muy dado a encontrarse por encima de $F=0.9$ (siendo $F=f, 0\le f\le1$) antes de las 2000 iteraciones. La inclusión de un índice de diversidad solucionó parcialmente este problema.
+    \item Estancamiento: con la mayoría de los métodos y mecanismos genéticos, la población era muy dada a estancarse muy rápidamente. El valor de \emph{fitness} del mejor individuo de la población era muy dado a encontrarse por encima de $F=0.9$ (siendo $F=f, 0\le f\le1$) antes de las 2000 iteraciones. La inclusión de un índice de diversidad solucionó parcialmente este problema.
 
     A continuación se listan los métodos de cruce aplicacados en la codificación ordenada, de menor a mayor estancamiento:
     \begin{itemize}
@@ -357,7 +399,7 @@ A lo largo del desarrollo de la práctica, hemos encontrado los siguientes probl
         \item cruce SCX no ordenado
         \item cruce SCX
     \end{itemize}
-    \item Lentitud de ejecución del código: la complejidad del código del Algoritmo Genético con codificación ordenada (en especial la selección $L$ veces sobre muestras de tamaño $K$, y la evaluación de fitness para toda la población) conllevaba una lentitud en la ejecución considerable, en especial para tamaños grandes de $P$ (tamaño de población) y $L$ (tamaño de hijos a generar, relacionado con la selección, el cruce y el reemplazo generacional). La solución propuesta consiste en paralelizar de manera concurrente la ejecución de estos dos métodos (selección y evaluación) para intentar aprovechar los recursos de la máquina y agilizar la ejecución. Lamentablemente, los resultados no ven una mejora substancial.
+    \item Lentitud de ejecución del código: la complejidad del código del Algoritmo Genético con codificación ordenada (en especial la selección $L$ veces sobre muestras de tamaño $K$, y la evaluación de \emph{fitness} para toda la población) conllevaba una lentitud en la ejecución considerable, en especial para tamaños grandes de $P$ (tamaño de población) y $L$ (tamaño de hijos a generar, relacionado con la selección, el cruce y el reemplazo generacional). La solución propuesta consiste en paralelizar de manera concurrente la ejecución de estos dos métodos (selección y evaluación) para intentar aprovechar los recursos de la máquina y agilizar la ejecución. Lamentablemente, los resultados no ven una mejora sustancial.
     \item Técnicas de cruce para codificaciones ordenadas: las técnicas de cruce aprendidas en clase (cruce multipunto, cruce simple), no sirven necesariamente para nuestra codificación ordenada, ya que había que aplicar restricciones en la generación del individuo o a posteriori (una vez generado el individuo). Por lo tanto, se aplican varias técnicas de cruce para codificaciones ordenadas o permutaciones, detalladas en la sección correspondiente de métodos de cruce.
 \end{itemize}
 
@@ -366,6 +408,5 @@ A lo largo del desarrollo de la práctica, hemos encontrado los siguientes probl
 Si bien la implementación de un algoritmo genético que solucione nuestro problema es relativamente trivial, el trabajo de investigación sobre las diferentes técnicas de Algoritmos Evolutivos y parámetros a utilizar, no lo es. Personalmente, aunque he disfrutado en la realización de esta práctica, considero que el volumen de trabajo necesario está a la altura de una práctica final (con un peso en la nota mayor, y una entrega más tardía).
 
 Creo que esta práctica nos ha servido para aprender mucho acerca de Algoritmos Genéticos y su aplicación, y en general estoy satisfecho con los resultados obtenidos.
-
 
 \end{document}

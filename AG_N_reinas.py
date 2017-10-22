@@ -73,12 +73,15 @@ class Queens_ordered:
 
         self.poblacion = poblacion;
 
-    def main(self):
+    def main(self, findAll):
         # bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
 
-        criterioDeParada =  self.solutions < 92 # True # self.ciclos < self.iter
-        while(criterioDeParada):
+        if(findAll and self.N == 8):
+            criterioDeParada = len(self.solutions) >= 92
+        else:
+            criterioDeParada =  False # len(self.solutions < 92) # self.ciclos < self.iter
+        while(not criterioDeParada):
         # while ( self.ciclos < self.iter):
             try:
                 # bar.update((self.ciclos*100)/self.iter)
@@ -143,7 +146,8 @@ class Queens_ordered:
                     self.bestValue = bestValue;
                 
                 # Ampliación: break para 1 solución, comentar para todas (parar a mano o en i iteraciones)
-                if(self.criterioDeParada): break;
+                if((not findAll and self.criterioDeParada) or criterioDeParada):
+                    break;
 
                 # t6 = time.time()
                 # print('Tiempo criterio de parada: ', (t6 - t5)*1000, '\n')
@@ -405,13 +409,14 @@ class Queens_ordered:
             self.solutions.append(individuo);
 
             # STATS
-            '''print(
-                PARA N = {}
-                SOLUTION FOUND: {}
-                {} evaluaciones,
-                {} ciclos
-                .format(self.N, individuo, self.evaluaciones, self.ciclos))
-            '''
+            print('''
+                [N-Queens GA ordered]
+                N={}
+                Solution: {}
+                Evaluaciones: {}
+                Ciclos: {}
+                Soluciones: {}
+                '''.format(self.N, individuo, self.evaluaciones, self.ciclos, len(self.solutions)))
             # BOARD
             # board = [(y, x) for (y, x) in enumerate(individuo)]
             # self.print_board(board);
@@ -465,11 +470,14 @@ class Queens_binary(Queens_ordered):
 
         self.poblacion = poblacion;
 
-    def main(self):
+    def main(self, findAll):
         # bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
-        criterioDeParada =  self.solutions < 92 # self.ciclos < self.iter
-        while(criterioDeParada):
+        if(findAll and self.N == 8):
+            criterioDeParada = len(self.solutions) >= 92
+        else:
+            criterioDeParada =  False # len(self.solutions < 92) # self.ciclos < self.iter
+        while(not criterioDeParada):
             try:
                 # bar.update((self.ciclos*100)/self.iter)
                 # selección
@@ -496,7 +504,7 @@ class Queens_binary(Queens_ordered):
                     self.diversityIndex = 1;
                     self.bestValue = bestValue;
                 
-                if(self.criterioDeParada):
+                if((not findAll and self.criterioDeParada) or criterioDeParada):
                     break;
 
             except KeyboardInterrupt:
@@ -603,15 +611,16 @@ class Queens_binary(Queens_ordered):
         if(fitness == 0 and individuo not in self.solutions):
             self.solutions.append(individuo);
 
-            '''
+            
             # STATS
-            print(
-                PARA N = {}
-                SOLUTION FOUND: {}
-                {} evaluaciones,
-                {} ciclos
-                .format(self.N, individuo, self.evaluaciones, self.ciclos))
-
+            print('''
+                [N-Queens GA binary]
+                N={}
+                Solution: {}
+                Evaluaciones: {}
+                Ciclos: {}
+                '''.format(self.N, individuo, self.evaluaciones, self.ciclos))
+            '''
             # BOARD
             board = []
             for (i, valor) in enumerate(individuo):
@@ -641,7 +650,7 @@ class Queens_bruteforce(Queens_ordered):
         # Ampliación: todas las soluciones
         self.solutions = 0
 
-    def main(self):
+    def main(self, findAll):
         solutions = []
         ciclos = 0
         (x, y) = (0, 0)
@@ -662,16 +671,17 @@ class Queens_bruteforce(Queens_ordered):
                     if(self.coords not in solutions):
                         solutions.append(self.coords[:])
                         self.solutions += 1
-                        '''print(
-                            [N-Queens GA bruteforce]
-                            N={}
-                            Solution: {}
-                            Ciclos: {}
-                            .format(self.N, self.coords, ciclos))
-                        '''
+                        print('''
+                [N-Queens bruteforce]
+                N={}
+                Solution: {}
+                Ciclos: {}
+                            '''.format(self.N, self.coords, ciclos))
+                        
                     # Queens_ordered.print_board(self, self.coords);
                     # Ampliación: break para 1 solución
-                    # break;
+                    if(not findAll): 
+                        break;
 
             elif(y == self.N-1):
                 # Backtracking
@@ -777,41 +787,45 @@ pm: probabilidad de mutación
 pc: probabilidad de cruce
 
 Ejemplo:
-python3 AG_N_reinas.py 8 20000 100 20 10 0.1 0.9
+antes:   python3 AG_N_reinas.py 8 20000 100 20 10 0.1 0.9
+despues: python3 AG_N_reinas.py 8 30000 100 4 30 0.04 0.9
 '''
 
 def_N = int(sys.argv[1])
 
-i = int(sys.argv[2])
-P = int(sys.argv[3])
-K = int(sys.argv[4])
-L = int(sys.argv[5])
+i = 30000   # int(sys.argv[2])
+P = 100     # int(sys.argv[3])
+K = 4       # int(sys.argv[4])
+L = 30      # int(sys.argv[5])
 
-pm = float(sys.argv[6])
-pc = float(sys.argv[7])
-
-# meta_test()
-# csv_writer_bf()
-# queens = Queens_ordered(def_N, i, P, K, L, pm, pc)
-
-TODO: CAMBIAR EL CRITERIO DE PARADA PRIMERO
+pm = 0.3    # float(sys.argv[6])
+pc = 0.9    # float(sys.argv[7])
 
 print('''
-    BRUTE FORCE:
+Problema de las N Reinas - AGE.
+
+Introduzca 'f' para fuerza bruta,
+'b' para genético con codificación binaria, y
+'o' para genético con codificación ordenada.
     ''')
-queens1 = Queens_bruteforce(def_N)
-queens1.main()
+method = input("Inserte el método a utilizar:")
+if(method=='f'):
+    queens = Queens_bruteforce(def_N)
+elif(method=='b'):
+    queens = Queens_binary(def_N, i, P, K, L, pm, pc)
+elif(method=='o'):
+    queens = Queens_ordered(def_N, i, P, K, L, pm, pc)
+else:
+    print('''
+Error: no se ha encontrado un método para {}
+    '''.format(method))
+    exit()
 
-print('''
-    BINARY:
+find = input("¿Desea buscar todas las soluciones? [y/n]")
+if(find!='y' and find!='n'):
+    print('''
+Error: por favor especifica sí o no
     ''')
+    exit()
 
-queens2 = Queens_binary(def_N, i, P, K, L, pm, pc)
-queens2.main()
-
-print('''
-    ORDERED:
-    ''')
-
-queens2 = Queens_ordered(def_N, i, P, K, L, pm, pc)
-queens2.main()
+queens.main(find=='y')

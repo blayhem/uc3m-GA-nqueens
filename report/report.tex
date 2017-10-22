@@ -113,7 +113,11 @@ A continuación, se implementa un Algoritmo Genético con el fin de hallar las s
 
 \section{Solucionar las N-reinas empleando fuerza bruta.}
 
-\subsection{¿Cuánto se tarda en obtener la primera solución?}
+Para esta aproximación al problema implementamos una solución por fuerza bruta al problema de las N-reinas. Esta implementación funciona tanto para encontrar una solución al problema como para encontrar todas (con diferentes criterios de parada y modificando ligeramente el código).
+
+La implementación empieza con un vector de $N$ reinas colocadas en coordenadas nulas, e intenta progresivamente colocarlas sobre el tablero, comprobando para cada una de ellas si no es adyacente a otra de las reinas ya colocadas anteriormente. Si no es así, se coloca la reina. Si recorremos todas las filas y no hemos sido capaces de colocar la reina que falta, hacemos backtrack eliminando la última reina colocada sobre el tablero (vector de coordenadas) y vuelta a empezar. Si esta opción tampoco es válida, necesitamos hacer doble backtracking para volver a una rama anterior para seguir explorando el árbol de búsqueda. Esto se consigue eliminando una reina más.
+
+Esta implementación es muy rápida ya que el código es simple, y para valores relativamente pequeños de $N$ el espacio de búsqueda no es muy grande. Considerando cada intento de colocar una reina como un ciclo, obtenemos los siguientes resultados:
 
 \begin{figure}[h]
     \center
@@ -122,8 +126,6 @@ A continuación, se implementa un Algoritmo Genético con el fin de hallar las s
     \end{subfigure}
     \caption{Número de iteraciones hasta encontrar 1 solución}
 \end{figure}
-
-\subsection{¿Cuánto se tardan en obtener soluciones subsecuentes?}
 
 \newpage
 \section{Solucionar las N-reinas con Algoritmos Genéticos.}
@@ -287,7 +289,7 @@ Para cada valor de $N$ se ha ejecutado el código 10 veces con los mismos parám
 
 \begin{figure}[h]
     \center
-    \begin{subfigure}{.80\textwidth}
+    \begin{subfigure}{.85\textwidth}
         \includegraphics[width=\textwidth]{binary}
     \end{subfigure}
     \caption{Codificación binaria}
@@ -311,15 +313,13 @@ Al implementar los cambios anteriormente descritos, vemos los siguientes resulta
 
 \begin{figure}[h]
     \center
-    \begin{subfigure}{.50\textwidth}
+    \begin{subfigure}{.85\textwidth}
         \includegraphics[width=\textwidth]{after}
     \end{subfigure}
     \caption{Versión final}
 \end{figure}
 
 En la versión final podemos ver que el número de evaluaciones tiene un crecimiento más suave, y el número de ciclos se reduce significativamente.
-
-\newpage
 
 \section{Ampliación}
 
@@ -331,20 +331,34 @@ Probar con los tres métodos.
 
 \subsection{Conclusiones}
 
-La memoria debe finalizar con unas conclusiones en las que resumáis los resultados de vuestro análisis: ¿qué técnica funciona mejor?, ¿cómo afecta a los resultados vuestra codificación mejorada?, ¿cómo escala cada técnica a valores elevados de N?, etc.
+Como hemos podido ver en los gráficos anteriores ilustrando las tres técnicas aplicadas a nuestro problema, la implementación final del algoritmo genético con los métodos y parámetros aplicados (selección repetida por torneo con muestra reducida, cruce ordenado simple, reemplazo general del 60-80\%, y mutación controlada con índice de diversidad) encuentra soluciones para diversos valores de $N$ en un número reducido de iteraciones/ciclos/generaciones, quedando muy por encima de los resultados con la codificación binaria.
+
+Desgraciadamente, al ser un método más complejo y requerir más tiempo de ejecución, para valores grandes de $N$, si bien encuentra solución en pocos ciclos, el tiempo de ejecución puede llegar a ser de horas. En esto gana la implementación por fuerza bruta, la cual encuentra soluciones para valores mucho mayores de $N$ con un ordenador con unas especificaciones medias a día de hoy (Intel Core i5-7360U 2.3-3.6 GHz y 8 GB de RAM a 2133 MHz).
+
+Esta aproximación al problema puede ser buena cuando la evaluación de la función de fitness tarde mucho tiempo (por el problema a tratar) y el cuello de botella no sea el tiempo de ejecución del código.
 
 \subsection{Problemas encontrados}
+
+A lo largo del desarrollo de la práctica, hemos encontrado los siguientes problemas:
+
 \begin{itemize}
-    \item Estancamiento. De menor a mayor estancamiento en cruce:
+    \item Estancamiento: con la mayoría de los métodos y mecanismos genéticos, la población era muy dada a estancarse muy rápidamente. El valor de fitness del mejor individuo de la población era muy dado a encontrarse por encima de $F=0.9$ (siendo $F=f, 0\le f\le1$) antes de las 2000 iteraciones. La inclusión de un índice de diversidad solucionó parcialmente este problema.
+
+    A continuación se listan los métodos de cruce aplicacados en la codificación ordenada, de menor a mayor estancamiento:
     \begin{itemize}
         \item cruce SCX aleatorio
         \item cruce SCX no ordenado
         \item cruce SCX
     \end{itemize}
-    \item Lentitud de ejecución del código. Solución propuesta: paralelizar. Resultados? no.
+    \item Lentitud de ejecución del código: la complejidad del código del Algoritmo Genético con codificación ordenada (en especial la selección $L$ veces sobre muestras de tamaño $K$, y la evaluación de fitness para toda la población) conllevaba una lentitud en la ejecución considerable, en especial para tamaños grandes de $P$ (tamaño de población) y $L$ (tamaño de hijos a generar, relacionado con la selección, el cruce y el reemplazo generacional). La solución propuesta consiste en paralelizar de manera concurrente la ejecución de estos dos métodos (selección y evaluación) para intentar aprovechar los recursos de la máquina y agilizar la ejecución. Lamentablemente, los resultados no ven una mejora substancial.
+    \item Técnicas de cruce para codificaciones ordenadas: las técnicas de cruce aprendidas en clase (cruce multipunto, cruce simple), no sirven necesariamente para nuestra codificación ordenada, ya que había que aplicar restricciones en la generación del individuo o a posteriori (una vez generado el individuo). Por lo tanto, se aplican varias técnicas de cruce para codificaciones ordenadas o permutaciones, detalladas en la sección correspondiente de métodos de cruce.
 \end{itemize}
 
 \subsection{Opiniones personales}
+
+Si bien la implementación de un algoritmo genético que solucione nuestro problema es relativamente trivial, el trabajo de investigación sobre las diferentes técnicas de Algoritmos Evolutivos y parámetros a utilizar, no lo es. Personalmente, aunque he disfrutado en la realización de esta práctica, considero que el volumen de trabajo necesario está a la altura de una práctica final (con un peso en la nota mayor, y una entrega más tardía).
+
+Creo que esta práctica nos ha servido para aprender mucho acerca de Algoritmos Genéticos y su aplicación, y en general estoy satisfecho con los resultados obtenidos.
 
 
 \end{document}

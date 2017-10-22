@@ -5,19 +5,23 @@
 \contentsline {subsection}{\numberline {1.2}Problema planteado.}{2}{subsection.1.2}
 \contentsline {section}{\numberline {2}Solucionar las N-reinas empleando fuerza bruta.}{2}{section.2}
 \contentsline {subsection}{\numberline {2.1}\IeC {\textquestiondown }Cu\IeC {\'a}nto se tarda en obtener la primera soluci\IeC {\'o}n?}{2}{subsection.2.1}
-\contentsline {subsection}{\numberline {2.2}\IeC {\textquestiondown }Cu\IeC {\'a}nto se tardan en obtener soluciones subsecuentes?}{2}{subsection.2.2}
-\contentsline {section}{\numberline {3}Solucionar las N-reinas con Algoritmos Gen\IeC {\'e}ticos.}{2}{section.3}
-\contentsline {subsection}{\numberline {3.1}Codificaci\IeC {\'o}n.}{2}{subsection.3.1}
-\contentsline {subsubsection}{\numberline {3.1.1}\IeC {\textquestiondown }Qu\IeC {\'e} otras alternativas se han barajado y descartado?}{2}{subsubsection.3.1.1}
-\contentsline {subsubsection}{\numberline {3.1.2}\IeC {\textquestiondown }Por qu\IeC {\'e} la codificaci\IeC {\'o}n actual es mejor que las otras?}{3}{subsubsection.3.1.2}
-\contentsline {subsection}{\numberline {3.2}Funci\IeC {\'o}n de fitness.}{3}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}M\IeC {\'e}todos implementados}{3}{subsection.3.3}
-\contentsline {subsubsection}{\numberline {3.3.1}Selecci\IeC {\'o}n}{3}{subsubsection.3.3.1}
-\contentsline {subsubsection}{\numberline {3.3.2}Cruce}{4}{subsubsection.3.3.2}
-\contentsline {subsubsection}{\numberline {3.3.3}Mutaci\IeC {\'o}n}{5}{subsubsection.3.3.3}
-\contentsline {subsubsection}{\numberline {3.3.4}Evaluaci\IeC {\'o}n de la poblaci\IeC {\'o}n: posibles soluciones}{5}{subsubsection.3.3.4}
-\contentsline {subsection}{\numberline {3.4}Parametrizaci\IeC {\'o}n}{5}{subsection.3.4}
-\contentsline {subsection}{\numberline {3.5}Resultados}{6}{subsection.3.5}
-\contentsline {section}{\numberline {4}Conclusiones, Problemas Encontrados y Opiniones Personales}{7}{section.4}
-\contentsline {section}{\numberline {5}Anexo}{7}{section.5}
+\contentsline {subsection}{\numberline {2.2}\IeC {\textquestiondown }Cu\IeC {\'a}nto se tardan en obtener soluciones subsecuentes?}{3}{subsection.2.2}
+\contentsline {section}{\numberline {3}Solucionar las N-reinas con Algoritmos Gen\IeC {\'e}ticos.}{4}{section.3}
+\contentsline {subsection}{\numberline {3.1}Codificaci\IeC {\'o}n.}{4}{subsection.3.1}
+\contentsline {subsubsection}{\numberline {3.1.1}\IeC {\textquestiondown }Qu\IeC {\'e} otras alternativas se han barajado y descartado?}{4}{subsubsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.2}\IeC {\textquestiondown }Por qu\IeC {\'e} la codificaci\IeC {\'o}n actual es mejor que las otras?}{4}{subsubsection.3.1.2}
+\contentsline {subsection}{\numberline {3.2}Funci\IeC {\'o}n de fitness.}{4}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}M\IeC {\'e}todos implementados}{5}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Selecci\IeC {\'o}n}{5}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}Cruce}{5}{subsubsection.3.3.2}
+\contentsline {subsubsection}{\numberline {3.3.3}Mutaci\IeC {\'o}n}{6}{subsubsection.3.3.3}
+\contentsline {subsubsection}{\numberline {3.3.4}Evaluaci\IeC {\'o}n de la poblaci\IeC {\'o}n: posibles soluciones}{6}{subsubsection.3.3.4}
+\contentsline {subsection}{\numberline {3.4}Parametrizaci\IeC {\'o}n}{7}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Resultados}{9}{subsection.3.5}
+\contentsline {section}{\numberline {4}Ampliaci\IeC {\'o}n}{10}{section.4}
+\contentsline {subsection}{\numberline {4.1}Todas las soluciones}{10}{subsection.4.1}
+\contentsline {section}{\numberline {5}Conclusiones, Problemas Encontrados y Opiniones Personales}{10}{section.5}
+\contentsline {subsection}{\numberline {5.1}Conclusiones}{10}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Problemas encontrados}{10}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Opiniones personales}{10}{subsection.5.3}
 \contentsfinish 

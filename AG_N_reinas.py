@@ -5,16 +5,19 @@ import random as r
 import sys
 import math
 import functools as ft
-# https://pypi.python.org/pypi/progressbar2
-# import progressbar
-# import matplotlib.pyplot as plt
 import requests
 import multiprocessing
 import concurrent.futures
 
+'''
+# Debugging & analysis tools:
 import time
 import csv
 
+# https://pypi.python.org/pypi/progressbar2
+# import progressbar
+# import matplotlib.pyplot as plt
+'''
 
 class Queens_ordered:
 
@@ -43,8 +46,8 @@ class Queens_ordered:
         self.pm = pm;
         self.pc = pc;
 
-        # GRAPHICS - valores de fitness para el mejor individuo
-        self.fvalues = [];
+        # Extra: GRAPHICS - valores de fitness para el mejor individuo
+        # self.fvalues = [];
 
         '''
         Parámetros internos
@@ -69,13 +72,13 @@ class Queens_ordered:
             poblacion.append(orderedList[:]);
 
         self.poblacion = poblacion;
-        # print(min(list(map(lambda i: self.getFitness(i), poblacion))))
 
     def main(self):
         # bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
-        # backup = []
-        while ( self.ciclos < self.iter):
+
+        while(True):
+        # while ( self.ciclos < self.iter):
             try:
                 # bar.update((self.ciclos*100)/self.iter)
 
@@ -83,10 +86,9 @@ class Queens_ordered:
                 1. Seleccionamos los padres. Los quitamos de la poblacion para hacer cruce.
                 Padres siempre es un número par, de tamaño L*2, donde L es el número de hijos.
                 '''
-                t1 = time.time()
+                # t1 = time.time()
                 padres = []
                 with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
-                    # print(future.result())
                     sel = [executor.submit(self.seleccion, poblacion, i%2==0, True) for i in range(0,2*self.L)]
                     for future in concurrent.futures.as_completed(sel):
                         padres.append(future.result())
@@ -95,70 +97,55 @@ class Queens_ordered:
                 2. Hacemos cruce con reemplazo L o L*2. Obtenemos L hijos o L*2 (según cruce)
                 self.cruce nos devuelve los hijos, L para SCX y L*2 para OC1.
                 '''
-                # nuevaPoblacion = self.cruce_SCX(padres);
-                t2 = time.time()
+                # t2 = time.time()
                 # print('Tiempo de selección: ', (t2 - t1)*1000)
                 nuevaPoblacion = self.cruce_OC1(padres);
-                # REEMPLAZO:
-                # poblacion = poblacion[self.L:]
-                poblacion = poblacion[self.L*2:]
+                poblacion = poblacion[len(nuevaPoblacion):]
+
                 '''
                 3. Mutamos la nueva poblacion.
                 Politica opcional: if son has clone in poblacion, do not add.
                 '''
-                t3 = time.time()
+                # t3 = time.time()
                 # print('Tiempo de cruce y reemplazo: ', (t3 - t2)*1000)
                 nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), nuevaPoblacion));
-                # nuevaPoblacion = list(map(lambda ind: self.mutacion(ind), padres));
                 poblacion += nuevaPoblacion;
                 self.ciclos += 1;
+
                 '''
                 4. Calculamos fitness de la poblacion para revisar el criterio
                 de parada
                 '''
-                t4 = time.time()
+                # t4 = time.time()
                 # print('Tiempo de mutación: ', (t4 - t3)*1000)
                 
-                # with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
+                with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
                 # with multiprocessing.Pool(multiprocessing.cpu_count()) as p:
-                for individuo in poblacion:
-                    self.check_exit(individuo)
-                        # executor.submit(self.check_exit, individuo)
+                    for individuo in poblacion:
+                    # self.check_exit(individuo)
+                        executor.submit(self.check_exit, individuo)
                         # p.map(self.check_exit, [individuo])
 
-                t5 = time.time()
+                # t5 = time.time()
                 # print('Tiempo de evaluación: ', (t5 - t4)*1000)
 
-                # GRAPHICS - mejor fitness de toda la población
                 bestValue = max(self.fitnesses.values())
+                # self.fvalues.append(bestValue)
                 # print('Best individual fitness: ', bestValue, 'worst individual fitness: ', min(self.fitnesses.values()), 'diversityIndex: ', int(self.diversityIndex))
                 if(bestValue == self.bestValue):
                     self.diversityIndex += 0.01
                     if(self.diversityIndex>10):
-                        # poblacion = backup[:]
                         self.diversityIndex = 1;
-                    # else:
-                        # backup = poblacion[:]
-                    # TODO: pseudo-backtracking
 
                 else:
                     self.diversityIndex = 1;
                     self.bestValue = bestValue;
                 
-                self.fvalues.append(bestValue)
-                
-                if(self.criterioDeParada):
-                    break;
+                # Ampliación: break para 1 solución, comentar para todas (parar a mano o en i iteraciones)
+                if(self.criterioDeParada): break;
 
-
-                t6 = time.time()
+                # t6 = time.time()
                 # print('Tiempo criterio de parada: ', (t6 - t5)*1000, '\n')
-                # if(self.ciclos>8): break;
-
-                if(bestValue==1):
-                    for individuo in poblacion:
-                        self.check_exit(individuo)
-                    # print('\nsolution found!', self.criterioDeParada)
 
             except KeyboardInterrupt:
                 print('RTL+C. Parando.')
@@ -168,23 +155,20 @@ class Queens_ordered:
             print('\nNo solution found. ', self.evaluaciones, 'evaluaciones', 'máximo fitness: ', self.bestValue, 'en ', self.ciclos, 'iteraciones')
         else:
             print(len(self.solutions), 'soluciones encontradas para N=', self.N)
-        
+        '''
         plt.plot(self.fvalues)
         title = 'N={}, K={}, L={}, p. de mutación={}, p. de cruce={}'.format(self.N, self.K, self.L, self.pm, self.pc)
         plt.title(title)
         plt.ylabel('fitness')
         plt.xlabel('iteraciones')
         plt.show()
-
+        '''
         return (self.evaluaciones, self.ciclos)
 
     def getFitness(self, individuo):
-        # self.print_board([(y, x) for (y, x) in enumerate(individuo)]);
-
         key = ''.join(str(n) for n in individuo)
         try:
             fitness = self.fitnesses[key];
-            # print('CACHED!')
             return fitness;
         except:
             # print('Calculating fitness...')
@@ -379,10 +363,11 @@ class Queens_ordered:
         return offspring
 
     def mutacion(self, individuo):
-        p = self.diversityIndex*self.pm #*self.N;     # probabilidad de mutación
+        # probabilidad de mutación
+        p = self.diversityIndex*self.pm #*self.N;
         size = len(individuo)
 
-        # swap 1 individuo solo
+        # swap 1 bit
         # for i in range(0, size):
         if(r.uniform(0, 1) < p):
             i = r.randrange(0, size);
@@ -419,7 +404,6 @@ class Queens_ordered:
             self.solutions.append(individuo);
 
             # STATS
-
             print('''
                 PARA N = {}
                 SOLUTION FOUND: {}
@@ -483,10 +467,8 @@ class Queens_binary(Queens_ordered):
     def main(self):
         # bar = progressbar.ProgressBar(redirect_stdout=False)
         poblacion = self.poblacion;
-        # backup = []
         while ( self.ciclos < self.iter):
             try:
-                # print(poblacion,'\n')
                 # bar.update((self.ciclos*100)/self.iter)
                 # selección
                 padres = [Queens_ordered.seleccion(self, poblacion, i%2==0, False) for i in range(0,2*self.L)]
@@ -514,13 +496,6 @@ class Queens_binary(Queens_ordered):
                 
                 if(self.criterioDeParada):
                     break;
-
-                if(bestValue==0.0):
-                    # forzamos
-                    for individuo in poblacion:
-                        self.check_exit(individuo)
-                # print(poblacion,'\n')
-                # if(self.ciclos > 4): break;
 
             except KeyboardInterrupt:
                 print('RTL+C. Parando.')
@@ -581,27 +556,9 @@ class Queens_binary(Queens_ordered):
                       r_x+r_y == ind_x+ind_y):
                         bad  += 1;
 
-                # index = evaluable.index(ind_x)
-                # evaluable.pop(index); # quitamos 1 reina adyacente para tener solo 1 arista
-
         # return (n/N - bad/n)
-        # if(bad == 0):
-            # return bad;
-        # else:
-            # best = 0
         fitness = (abs(self.N-queens) + bad)
-        # print('bad: ', bad)
         self.fitnesses[key] = fitness
-
-        '''
-        board = []
-        for (i, valor) in enumerate(individuo):
-            if(valor==1):
-                board.append((int(i/self.N), i%self.N))
-        self.print_board(board);
-        print(fitness)
-        exit()
-        '''
 
         return fitness;
 
@@ -644,8 +601,8 @@ class Queens_binary(Queens_ordered):
         if(fitness == 0 and individuo not in self.solutions):
             self.solutions.append(individuo);
 
-            # STATS
             '''
+            # STATS
             print(
                 PARA N = {}
                 SOLUTION FOUND: {}
@@ -762,7 +719,7 @@ def meta_test():
         queens = Queens_ordered(N, i, P, K, L, pm, pc)
         queens.main()
 
-def ods_writer():
+def csv_writer():
     with open('detail.csv', 'w', newline='') as detail, open('mini.csv', 'w', newline='') as mini:
         detailWriter = csv.writer(detail)
         miniWriter  = csv.writer(mini)
@@ -785,7 +742,7 @@ def ods_writer():
             meanciclos = ft.reduce(lambda a,b: a+b, ciclos_sum)/10
             miniWriter.writerow([N, meaneval, meanciclos])
 
-def ods_writer_bf():
+def csv_writer_bf():
     with open('detail.csv', 'w', newline='') as detail, open('mini.csv', 'w', newline='') as mini:
         detailWriter = csv.writer(detail)
         miniWriter  = csv.writer(mini)
@@ -823,8 +780,8 @@ Ejemplo:
 python3 AG_N_reinas.py 8 20000 100 20 10 0.1 0.9
 '''
 
-# def_N = int(sys.argv[1])
-'''
+def_N = int(sys.argv[1])
+
 i = int(sys.argv[2])
 P = int(sys.argv[3])
 K = int(sys.argv[4])
@@ -832,10 +789,9 @@ L = int(sys.argv[5])
 
 pm = float(sys.argv[6])
 pc = float(sys.argv[7])
-'''
 
-#meta_test()
-ods_writer_bf()
-# queens = Queens_binary(def_N, i, P, K, L, pm, pc)
+# meta_test()
+# csv_writer_bf()
+queens = Queens_ordered(def_N, i, P, K, L, pm, pc)
 # queens = Queens_bruteforce(def_N)
-# queens.main()
+queens.main()

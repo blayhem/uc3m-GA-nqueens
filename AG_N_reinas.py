@@ -93,7 +93,8 @@ class Queens_ordered:
                 # t1 = time.time()
                 padres = []
                 with concurrent.futures.ThreadPoolExecutor(max_workers=multiprocessing.cpu_count()) as executor:
-                    sel = [executor.submit(self.seleccion, poblacion, i%2==0, True) for i in range(0,2*self.L)]
+                    sel = [executor.submit(self.seleccion, poblacion, i%2==0, True) for i in range(0,self.L)]
+                    # sel = [executor.submit(self.seleccion, poblacion, i%2==0, True) for i in range(0,2*self.L)]
                     for future in concurrent.futures.as_completed(sel):
                         padres.append(future.result())
 
@@ -103,9 +104,8 @@ class Queens_ordered:
                 '''
                 # t2 = time.time()
                 # print('Tiempo de selección: ', (t2 - t1)*1000)
-                nuevaPoblacion = self.cruce_OC1(padres);
+                nuevaPoblacion = self.cruce_SCX(padres);
                 poblacion = poblacion[len(nuevaPoblacion):]
-
                 '''
                 3. Mutamos la nueva poblacion.
                 Politica opcional: if son has clone in poblacion, do not add.
@@ -142,6 +142,7 @@ class Queens_ordered:
                         self.diversityIndex = 1;
 
                 else:
+                    # print(bestValue)
                     self.diversityIndex = 1;
                     self.bestValue = bestValue;
                 
@@ -287,7 +288,7 @@ class Queens_ordered:
             p2 = padres[(i*2)+1]
             hijo = []
 
-            if(len(p1) != len(p2) or len(p1) != N):
+            if(len(p1) != len(p2) or len(p1) != self.N):
                 raise ValueError('La longitud de los padres difiere.')
 
             for bit in range(0,self.N):
@@ -412,8 +413,8 @@ class Queens_ordered:
             print('''
                 [N-Queens GA ordered]
                 N={}
-                Solution: {}
-                Evaluaciones: {}
+                {}
+                {}
                 Ciclos: {}
                 Soluciones: {}
                 '''.format(self.N, individuo, self.evaluaciones, self.ciclos, len(self.solutions)))
@@ -616,8 +617,8 @@ class Queens_binary(Queens_ordered):
             print('''
                 [N-Queens GA binary]
                 N={}
-                Solution: {}
-                Evaluaciones: {}
+                {}
+                {}
                 Ciclos: {}
                 '''.format(self.N, individuo, self.evaluaciones, self.ciclos))
             '''
@@ -792,22 +793,26 @@ despues: python3 AG_N_reinas.py 8 30000 100 4 30 0.04 0.9
 '''
 
 def_N = int(sys.argv[1])
-
+# Para 10: P=15, K=3, L=12
+# Para 25: P=15, K=3, L=12
+# Para 50: P=20, K=4, L=15
+# Para 100:P=200, K=10, L=99
 i = 30000   # int(sys.argv[2])
-P = 100     # int(sys.argv[3])
-K = 4       # int(sys.argv[4])
-L = 30      # int(sys.argv[5])
+P = int(sys.argv[2])
+K = int(sys.argv[3])
+L = int(sys.argv[4])
 
 pm = 0.3    # float(sys.argv[6])
 pc = 0.9    # float(sys.argv[7])
 
 print('''
+N={}, P={}, K={}, L={}
 Problema de las N Reinas - AGE.
 
 Introduzca 'f' para fuerza bruta,
 'b' para genético con codificación binaria, y
 'o' para genético con codificación ordenada.
-    ''')
+    '''.format(def_N, P, K, L))
 method = input("Inserte el método a utilizar:")
 if(method=='f'):
     queens = Queens_bruteforce(def_N)

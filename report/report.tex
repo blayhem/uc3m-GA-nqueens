@@ -338,20 +338,20 @@ A continuación se detallan el número necesario de ciclos y evaluaciones para i
         \hline
         Fuerza bruta & 92 & 16456 & - & 0.151s\\ 
         \hline
-        AG c. binaria & 2 & 381172 & 9252 & 33m23s\\
+        AG c. binaria & 22 & 62490 & 3173586 & 33m23s\\
         \hline
-        AG c. ordenada & 22 & 1628883 & 5484 & 2h46m01s\\
+        AG c. ordenada & 92 & 2041 & 35819  & 19s\\
         \hline
     \end{tabular}
     }
     \caption{Resultados para diversas soluciones}
 \end{figure}
 
-Aunque los tiempos, el número de soluciones y ciclos varíen, se puede observar claramente que el algoritmo de fuerza bruta mejora muy sustancialmente los resultados de los otros dos (para un número pequeño de $N$ como es 8). El genético con la codificación ordenada no tiene mal desempeño en número de soluciones dadas y evaluaciones requeridas, pero sí en tiempo de ejecución y en ciclos.
+Aunque los tiempos, el número de soluciones y ciclos varíen, se puede observar claramente que el algoritmo de fuerza bruta mejora muy sustancialmente los resultados de los otros dos (para un número pequeño de $N$ como es 8). El genético con la codificación ordenada desempeña bien en número de evaluaciones y ciclos, a pesar de quedar peor en tiempo de ejecución con respecto al algoritmo de fuerza bruta.
 
-El genético con la codificación binaria es el que peor resultado obtiene, consiguiendo sacar solo dos soluciones en 381 172 ciclos y algo más de 30 minutos de ejecución.
+El genético con la codificación binaria es el que peor resultado obtiene, consiguiendo sacar solo 22 soluciones en 62 490 ciclos y algo más de 30 minutos de ejecución.
 
-Aquí podemos ver en detalle el número de ciclos necesarios para hallar las soluciones 1 a 22 en el algoritmo genético con codificación ordenada.
+Con la \textbf{primera versión} del algoritmo genético, obteníamos 22 soluciones en 1 628 883 ciclos (algo más de 2h de ejecución). Aquí podemos ver en detalle el número de ciclos necesarios para hallar las soluciones 1 a 22 en el algoritmo genético con codificación ordenada en esta primera versión.
 
 \clearpage\newpage
 \begin{figure}[h]
@@ -372,7 +372,11 @@ A partir de este conjunto de datos se intenta ajustar los valores a una ecuació
     \caption{Ecuación de ajuste con los datos previamente representados}
 \end{figure}
 
-Si sustituimos el número de soluciones deseadas (92) en la ecuación anterior, obtenemos un valor de $5.40445*10^9$ ciclos. Teniendo en cuenta que el tiempo medio por ciclo es de $0.01075124740600586$ segundos, el tiempo estimado para hallar 92 soluciones en un tablero de $8x8$ con nuestro algoritmo genético de codificación ordenada sería alrededor de 16 140 horas ($672.5$ días, o $1.84$ años, según se prefiera).
+Si sustituimos el número de soluciones deseadas (92) en la ecuación anterior, obtenemos un valor de $5.40445*10^9$ ciclos. Teniendo en cuenta que el tiempo medio por ciclo es de $0.01075124740600586$ segundos, el tiempo estimado para hallar 92 soluciones en un tablero de $8x8$ con nuestro algoritmo genético de codificación ordenada (en la primera versión) hubiera sido alrededor de 16 140 horas ($672.5$ días, o $1.84$ años, según se prefiera).
+
+Comparando estos resultados con la segunda versión de nuestro algoritmo genético de codificación ordenada (el cual nos da las 92 soluciones para $N=8$ en menos de 20 segundos), podemos ver que la diferencia es más que considerable. La causa de esto era el estancamiento, ya que nuestro genético era muy dado a quedarse en mínimos o máximos locales (en función de la función de evaluación), y le costaba mucho avanzar hacia otras soluciones.
+
+\textbf{Nota}: los valores de ciclos, tiempo y evaluaciones en el A.G. con codificación ordenada de la tabla se han obtenido ejecutando el algoritmo varias veces con el fin de reducir aleatoriedad en los tiempos de búsqueda. En el algoritmo de fuerza bruta no ha hecho falta, y en el binario ha sido imposible.
 
 \clearpage\newpage
 
@@ -405,7 +409,7 @@ A lo largo del desarrollo de la práctica, hemos encontrado los siguientes probl
 
 \subsection{Opiniones personales}
 
-Si bien la implementación de un algoritmo genético que solucione nuestro problema es relativamente trivial, el trabajo de investigación sobre las diferentes técnicas de Algoritmos Evolutivos y parámetros a utilizar, no lo es. Personalmente, aunque he disfrutado en la realización de esta práctica, considero que el volumen de trabajo necesario está a la altura de una práctica final (con un peso en la nota mayor, y una entrega más tardía).
+Si bien la implementación de un algoritmo genético que solucione nuestro problema es relativamente trivial, el trabajo de investigación sobre las diferentes técnicas de Algoritmos Evolutivos y parámetros a utilizar, no lo es. Personalmente, aunque he disfrutado en la realización de esta práctica, considero que el volumen de trabajo necesario está a la altura de una práctica final. Quizás hubiera sido interesante ahorrarnos la codificación binaria, que ya sabíamos que no iba a dar buenos resultados, de cara a aligerar el tiempo de realización de esta práctica.
 
 Creo que esta práctica nos ha servido para aprender mucho acerca de Algoritmos Genéticos y su aplicación, y en general estoy satisfecho con los resultados obtenidos.
 
